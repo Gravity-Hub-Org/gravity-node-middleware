@@ -7,7 +7,10 @@ COPY /proof-of-concept/contracts /app/contracts
 
 RUN apk add npm
 RUN npm install -g truffle
-RUN cd ./contracts/ethereum && truffle migrate --network external
+
+RUN cd ./contracts/ethereum && \
+    ./patcher --eth-address $ETH_ADDRESS && \
+    truffle migrate --network external
 
 RUN cd ./gh-node && \
     ./build-conf.sh --nebula "NEBULA_ADDRESS" && \
