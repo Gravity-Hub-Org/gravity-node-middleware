@@ -12,8 +12,6 @@ COPY --from=tendermint /var/www/tendermint /proof-of-concept/ledger-node/data
 
 COPY tendermint-config.toml /proof-of-concept/ledger-node/data/config/config.toml
 
-RUN go mod download
-RUN cd ledger-node
-RUN go build
+RUN cd ledger-node && go build
 
 ENTRYPOINT [ "./ledger-node" ]
