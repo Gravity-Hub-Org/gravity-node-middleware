@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+  geth:
+    image: "ethereum/client-go:stable"
+    restart: always
+    container_name: "geth-gh"
+    command: "--dev --rpc --rpcaddr '0.0.0.0' --dev.period 5 --rpcport 8545 --ws --wsaddr '0.0.0.0' --wsport 8545 --cache 4096"
+    build:
+      context: .
+      dockerfile: Dockerfile-geth
+    volumes:
+      - "$HOME/.geth/dev/:/root/.ethereum/"
+    ports:
+      - 8545:8545
+      - 8546:8546
+      # - 30303:30303
+      # - 30303:30303/udp
+  tendermint:
+    image: "tendermint/tendermint:stable"
+    restart: always
+    container_name: "geth-gh"
+    command: "init —home ./data"
+    build:
+      context: .
+      dockerfile: Dockerfile-tendermint
+    # volumes:
+      - "$HOME/.tendermint/dir/:/root/ledger-node"
+    ports:
+      # - 8180:8180
+      - 8545:8545
+      - 8546:8546
+      # - 30301:30301/udp
+      - 30303:30303
+      - 30303:30303/udp
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
