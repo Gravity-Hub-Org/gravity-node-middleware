@@ -12,7 +12,7 @@ COPY --from=tendermint /var/www/tendermint /proof-of-concept/ledger-node/data
 
 COPY tendermint-config.toml /proof-of-concept/ledger-node/data/config/config.toml
 
-RUN apk add gcc
+RUN apk add build-base
 RUN cd ledger-node && go build
 
 ENTRYPOINT [ "./ledger-node" ]
