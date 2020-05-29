@@ -1,0 +1,3 @@
+[submodule "proof-of-concept"]
+	path = proof-of-concept
+	url = https://github.com/Gravity-Hub-Org/proof-of-concept.git
