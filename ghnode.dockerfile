@@ -6,11 +6,11 @@ COPY /proof-of-concept/gh-node /app/gh-node
 COPY /proof-of-concept/contracts /app/contracts
 
 RUN apk add npm
-RUN npm i -g --allow-root truffle
+RUN npm i -g --unsafe-perm=true --allow-root truffle
 
 RUN cd ./contracts/ethereum && \
     ls -la && \
-    ./patcher --eth-address $ETH_ADDRESS && \
+    /bin/sh patcher.sh --eth-address $ETH_ADDRESS --eth-network $ETH_NETWORK && \
     truffle migrate --network external
 
 RUN cd ./gh-node && \
