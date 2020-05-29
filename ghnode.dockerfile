@@ -14,10 +14,12 @@ RUN cd ./contracts/ethereum && \
     ls -la && \
     /bin/sh patcher.sh --eth-network $ETH_NETWORK --eth-address $ETH_ADDRESS && \
     cat truffle-config.js && sleep 1 && \
-    truffle migrate --network external
+    truffle migrate --network external >> migration.txt 
+
+RUN export NEBULA_ADDRESS=$(cd ./contracts/ethereum && cat migration.txt | ./address-extractor.sh)
 
 RUN cd ./gh-node && \
-    ./build-conf.sh --nebula "NEBULA_ADDRESS" && \
+    ./build-conf.sh --nebula $NEBULA_ADDRESS && \
     go build
 
 ENTRYPOINT [ "./gh-node" ]
