@@ -6,9 +6,10 @@ COPY /proof-of-concept/gh-node /app/gh-node
 COPY /proof-of-concept/contracts /app/contracts
 
 RUN apk add npm
-RUN npm install -g truffle
+RUN npm i -g --allow-root truffle
 
 RUN cd ./contracts/ethereum && \
+    ls -la && \
     ./patcher --eth-address $ETH_ADDRESS && \
     truffle migrate --network external
 
