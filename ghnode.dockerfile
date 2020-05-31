@@ -1,4 +1,4 @@
-FROM golang:1.14-alpine as gh-node
+FROM golang:1.14-buster as gh-node
 
 WORKDIR /app
 
@@ -6,7 +6,13 @@ COPY /proof-of-concept/ /app/
 # COPY /proof-of-concept/gh-node /app/proof-of-concept/gh-node
 # COPY /proof-of-concept/contracts /app/proof-of-concept/contracts
 
-RUN apk add npm build-base
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get install bash
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install -y nodejs && curl -L https://npmjs.org/install.sh | sh
+RUN apt-get update && \
+    apt-get -y install gcc mono-mcs && \
+    rm -rf /var/lib/apt/lists/*
 RUN npm i -g --unsafe-perm=true --allow-root truffle
 
 ARG ETH_NETWORK=0.0.0.0
