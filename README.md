@@ -2,6 +2,14 @@
 
 ##  Deployment
 
+You can automatically start deploying the environment by calling:
+
+```
+bash pure-start.sh --simple
+```
+
+Or manually:
+
 ###  1. Run Ethereum node in dev mode
 
 Run script and wait for couple of minutes for node to sync.
