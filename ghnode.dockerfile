@@ -4,10 +4,6 @@ WORKDIR /app
 
 COPY /proof-of-concept/ /app/
 
-# Set aliases
-RUN alias address-extractor="bash $PWD/contracts/ethereum/address-extractor.sh"
-RUN alias truffle-patcher="bash $PWD/contracts/ethereum/patcher.sh"
-
 ENV DEBIAN_FRONTEND noninteractive
 
 # Deps
@@ -24,13 +20,13 @@ ARG ETH_NETWORK=0.0.0.0
 ARG ETH_ADDRESS=idk
 
 RUN cd ./contracts/ethereum && \
-    truffle-patcher --eth-network $ETH_NETWORK --eth-address $ETH_ADDRESS && \
+    bash patcher.sh --eth-network $ETH_NETWORK --eth-address $ETH_ADDRESS && \
     cat truffle-config.js && sleep 1 && \
     truffle migrate --network external >> migration.txt
 
 RUN echo "Migration file: \n" && cat ./contracts/ethereum/migration.txt
 
-RUN cd ./contracts/ethereum && cat migration.txt | address-extractor >> nebula-address.txt
+RUN cd ./contracts/ethereum && cat migration.txt | bash address-extractor.sh >> nebula-address.txt
 
 RUN export NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-address.txt) && \
     cd ./gh-node && ls -la && \

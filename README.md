@@ -3,10 +3,16 @@
 
 #### Deployment
 
-#### Run ethereum node in dev mode
+#### Run Ethereum node in dev mode
 ```
 bash run-geth.sh
 ```
+
+### Build Gravity node image
+#### You should grab ethereum node address and ethereum network
+
+#### Address:
+> docker
 
 ```
     docker build -f ghnode.dockerfile \
