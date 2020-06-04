@@ -36,13 +36,15 @@ shutdown_environment () {
 # Sig kill handler
 trap 'echo "Terminating environment..."; shutdown_environment' SIGINT
 
-
 main () {
     while [ -n "$1" ]
     do
         case "$1" in
             --simple) pure_start ;;
             --shutdown) shutdown_environment ;;
+
+            # misc
+            --get-eth-node-id) echo $(get_ethereum_node_cont_id) ;;
         esac
         shift
     done
