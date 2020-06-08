@@ -25,7 +25,7 @@ start_multiple () {
     simple_start
 
     eth_node_id=$(bash pure-start.sh --get-eth-node-id)
-    sleep 15
+    sleep 10
 
     echo "Creating $address_qty additional ETH addresses..."
 
@@ -52,7 +52,7 @@ main () {
     while [ -n "$1" ]
     do
         case "$1" in
-            # --simple) simple_start ;;
+            --simple) simple_start ;;
             --start-*) start_multiple $1 ;;
         esac
         shift
