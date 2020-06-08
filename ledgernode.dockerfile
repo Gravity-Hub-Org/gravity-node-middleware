@@ -6,7 +6,9 @@ WORKDIR /var/www/tendermint
 RUN chmod -R 777 .
 RUN tendermint init --home .
 
-FROM golang:1.14-alpine as ledger-node
+FROM golang:1.14-buster as ledger-node
+
+USER root
 
 WORKDIR /proof-of-concept
 
@@ -19,7 +21,11 @@ ARG WAVES_NODE_URL="https://nodes-stagenet.wavesnodes.com"
 
 RUN printf $(cat tendermint-template.toml) $ETH_NODE_URL $WAVES_NODE_URL > ./ledger-node/data/config/config.toml
 
-RUN apk add build-base
-RUN cd ledger-node && go build
+# RUN apk add build-base
+RUN apt-get update && \
+    apt-get -y install gcc mono-mcs && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN cd ledger-node && go build && chmod +x ledger-node && chmod -R 777 . && ls -la
 
 ENTRYPOINT [ "./ledger-node" ]

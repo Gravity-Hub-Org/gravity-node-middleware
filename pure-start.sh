@@ -1,5 +1,9 @@
 #!/bin/bash
 
+ghnode_tag='gh-node:1'
+ledgernode_tag='ledger-node:1'
+ledgernodes_qty=5
+
 get_ethereum_node_cont_id () {
     echo $(docker ps -a | grep ethereum/client-go | awk '{ print $1 }')
 }
@@ -7,6 +11,14 @@ get_ethereum_node_cont_id () {
 get_ethereum_node_ip_address () {
     cont_id=$(get_ethereum_node_cont_id)
     echo $(docker exec $cont_id ifconfig | grep inet | head -n1 | awk '{ print $2 }' | cut -d: -f2)
+}
+
+configure_ledger_nodes () {
+
+    for ((i = 0; i<$ledgernodes_qty; i++))
+    do
+        
+    done
 }
 
 pure_start () {
@@ -23,7 +35,9 @@ pure_start () {
 
     docker build -f ghnode.dockerfile \
         --build-arg ETH_ADDRESS=$eth_address \
-        --build-arg ETH_NETWORK=$eth_node_ip -t gh-node:2 .
+        --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag" .
+
+    configure_ledger_nodes
 }
 
 shutdown_environment () {
