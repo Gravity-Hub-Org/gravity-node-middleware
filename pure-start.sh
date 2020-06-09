@@ -22,7 +22,7 @@ configure_ledger_nodes () {
 
     # for ((i = 0; i<$ledgernodes_qty; i++))
     # do
-	# # local tag="1.$((i+1))"
+	#     # local tag="1.$((i+1))"
     #     # local image_name="$ledgernode_tag:$tag"
     #     local tag=$((i+1))
 	#     echo "Building ledger node #$tag"

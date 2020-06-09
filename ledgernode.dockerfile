@@ -29,4 +29,4 @@ RUN apt-get update && \
 RUN cd ledger-node && ls -la && ls -la ./data/config/
 RUN cd ledger-node && go build && chmod +x ledger-node
 
-ENTRYPOINT ./ledger-node/ledger-node
+ENTRYPOINT cd ledger-node && ./ledger-node --config "$PWD/data/config/config.toml"
