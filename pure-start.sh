@@ -74,8 +74,10 @@ configure_ledger_nodes () {
       volume_list[i]=$volume_name
 
       docker volume create "$volume_name"
-
-      local ledger_id=$(docker run -d -v "$volume_name:/proof-of-concept" "$image_name")
+    
+      # local ledger_id=$(docker run -d -v "$HOME/$volume_name:/proof-of-concept" "$image_name")
+      # local ledger_id=$(docker run -d -v "$HOME/$volume_name:/proof-of-concept" "$image_name")
+      local ledger_id=$(docker run -d --mount source=$volume_name,destination=$HOME/$volume_name "$image_name")
 
       ledger_ids[i]=$ledger_id
       sleep 3
@@ -104,7 +106,9 @@ configure_ledger_nodes () {
       then
         seeds_list+=','
       fi
-      seeds_list+="${address_list[j]}@${p2p_urls[j]}"
+
+      seed_address=$(echo ${p2p_urls[j]} | sed 's/tcp:\/\///')
+      seeds_list+="${address_list[j]}@$seed_address"
 
       validators=$(echo $validators | jq ". + [$current_valid_obj]")
     done
@@ -124,12 +128,35 @@ configure_ledger_nodes () {
       
       # update genesis.json
       local template=$(echo ".validators = $(echo $validators)")
-      
+
+      # docker cp ./test.txt f72bd9786d59:/proof-of-concept      
+
       # docker exec "$ledger_id" cat "$genesis_file_url" | jq "$template" > "$genesis_file_url"
+      # new_genesis=$(docker exec "$ledger_id" cat "$genesis_file_url" | jq "$template")
+
+      # docker cp e09790e06ea4:/proof-of-concept/ledger-node/data/config/genesis.json I
+      
+      # get current genesis
+      docker cp "$ledger_id:/proof-of-concept$genesis_file_url" ./current.json
+      cat ./current.json | jq "$template" > current.json
+
+      docker cp ./current.json "$ledger_id:/proof-of-concept/$genesis_file_url"
+      docker exec "$ledger_id" cat ".$genesis_file_url"
+      # rm temp.json
       
       echo "Node #$((j+1)) genesis.json updated"
       # docker exec -it "$ledger_id" cat "$genesis_file_url"
       # sed 's/seeds\ =\ \"\"/seeds\ =\"like\"/' tendermint-template.toml 
+
+      # docker cp "$ledger_id:/proof-of-concept$toml_file_url" ./current.toml
+      # sed 's/seeds\ =\ \"\"/seeds\ =\"like\"/' tendermint-template.toml > ./current.toml
+
+      # echo "TOML" && cat ./current.toml
+      # docker cp ./current.toml "$ledger_id:/proof-of-concept/$toml_file_url"
+
+      # docker exec "$ledger_id" cat ".$toml_file_url"
+      rm current.json     
+
       echo "Seeds: $seeds_list"
       # docker stop "$ledger_id"
       # docker start "$ledger_id"
@@ -140,6 +167,15 @@ configure_ledger_nodes () {
          # sed 's/seeds\ =\ \"\"/seeds\ =\"dick\"/'
          local sed_temp=$(printf 's/seeds\ =\ \"\"/seeds\ =\"%s\"/' "$seeds_list")
          # docker exec "$ledger_id" sed "$sed_temp" "$toml_file_url" > "$toml_file_url"
+
+         docker cp "$ledger_id:/proof-of-concept$toml_file_url" ./current.toml
+
+         sed "$sed_temp" ./current.toml > ./config.toml
+         # sed 's/seeds\ =\ \"\"/seeds\ =\"like\"/' tendermint-template.toml > ./current.toml
+
+         echo "Apt toml" && cat ./config.toml
+         docker cp ./config.toml "$ledger_id:/proof-of-concept/$toml_file_url"
+         rm current.toml config.toml
       fi
 
       docker stop "$ledger_id"
