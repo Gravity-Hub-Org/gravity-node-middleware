@@ -68,7 +68,7 @@ configure_ledger_nodes () {
 
       local image_name="$ledgernode_tag"
       # no cache for pure dir init
-      # docker build -f ledgernode.dockerfile -t "$image_name" .
+      docker build --no-cache -f ledgernode.dockerfile -t "$image_name" .
 
       volume_name=$(printf "%s-volume-%s" $ledgernode_tag $i)
       volume_list[i]=$volume_name
