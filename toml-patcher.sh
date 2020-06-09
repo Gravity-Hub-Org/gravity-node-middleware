@@ -44,6 +44,9 @@ main() {
       -o) out_file=$2 ;;
 
       --pairs) pairs=$2 ;;
+
+      # distinct operations
+      --escape) echo $(auto_escape $2); exit 0;
     esac
     shift
   done
