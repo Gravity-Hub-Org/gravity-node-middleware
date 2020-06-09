@@ -16,6 +16,7 @@ get_ethereum_node_ip_address () {
 configure_ledger_nodes () {
     # Building only once
 
+    local image_name="$ledgernode_tag"
     docker build -f ledgernode.dockerfile -t "$image_name" .
     docker run docker run ledger-node -v $HOME/ledger-node/:/proof-of-concept
     
