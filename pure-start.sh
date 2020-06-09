@@ -1,7 +1,7 @@
 #!/bin/bash
 
-ghnode_tag='gh-node:1'
-ledgernode_tag='ledger-node:1'
+ghnode_tag='gh-node'
+ledgernode_tag='ledger-node'
 ledgernodes_qty=5
 
 get_ethereum_node_cont_id () {
@@ -15,9 +15,18 @@ get_ethereum_node_ip_address () {
 
 configure_ledger_nodes () {
 
+    # Building only once
+
+    docker build -f ledgernode.dockerfile -t "$image_name" .
+
     for ((i = 0; i<$ledgernodes_qty; i++))
     do
-        
+	# local tag="1.$((i+1))"
+        # local image_name="$ledgernode_tag:$tag"
+        local tag=$((i+1))
+	    echo "Building ledger node #$tag"
+
+        docker run $image_name 
     done
 }
 
@@ -27,7 +36,7 @@ pure_start () {
     echo "Please wait up to 15 sec..."
     bash run-geth.sh
 
-    sleep 15
+    sleep 12
 
     eth_address=$(bash geth-helper.sh --node-address)
     # grab first geth node network interface
@@ -35,7 +44,7 @@ pure_start () {
 
     docker build -f ghnode.dockerfile \
         --build-arg ETH_ADDRESS=$eth_address \
-        --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag" .
+        --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
 
     configure_ledger_nodes
 }
@@ -54,7 +63,12 @@ main () {
     while [ -n "$1" ]
     do
         case "$1" in
+	    # variables
+	    --ledger-qty) ledgernodes_qty=$2 ;;
+
+	    # operations
             --simple) pure_start ;;
+            --conf-ledger) configure_ledger_nodes ;;
             --shutdown) shutdown_environment ;;
 
             # misc
