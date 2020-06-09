@@ -38,6 +38,9 @@ fast_sync = true
 #   - use rocksdb build tag (go build -tags rocksdb)
 db_backend = "goleveldb"
 
+ethNodeUrl
+wavesNodeUrl
+
 # Database directory
 db_dir = "data"
 
