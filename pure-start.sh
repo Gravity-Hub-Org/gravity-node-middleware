@@ -18,7 +18,7 @@ configure_ledger_nodes () {
 
     local image_name="$ledgernode_tag"
     docker build -f ledgernode.dockerfile -t "$image_name" .
-    docker run -d -v $HOME/ledger-node/:/proof-of-concept "$image_name"
+    docker run -d "$image_name"
 
     # for ((i = 0; i<$ledgernodes_qty; i++))
     # do
