@@ -13,22 +13,71 @@ get_ethereum_node_ip_address () {
     echo $(docker exec $cont_id ifconfig | grep inet | head -n1 | awk '{ print $2 }' | cut -d: -f2)
 }
 
+trim_by_one () {
+    echo $1 | head -c -2 | tail -c +2
+}
+
+get_validator_template() {
+    printf '
+    {
+      "address": "%s",
+      "pub_key": {
+        "type": "tendermint/PubKeyEd25519",
+        "value": "%s"
+      },
+      "power": "10",
+      "name": ""
+    }
+    ' "$1" "$2"
+}
+
 configure_ledger_nodes () {
     # Building only once
+    pub_keys=()
+    address_list=()
+    ledger_ids=()
 
-    local image_name="$ledgernode_tag"
-    docker build -f ledgernode.dockerfile -t "$image_name" .
-    docker run -d "$image_name"
+    for ((i = 0; i<$ledgernodes_qty; i++))
+    do
+      local tag="1.$((i+1))"
 
-    # for ((i = 0; i<$ledgernodes_qty; i++))
-    # do
-	#     # local tag="1.$((i+1))"
-    #     # local image_name="$ledgernode_tag:$tag"
-    #     local tag=$((i+1))
-	#     echo "Building ledger node #$tag"
+      local image_name="$ledgernode_tag:$tag"
+      docker build -f ledgernode.dockerfile -t "$image_name" .
 
-    #     docker run $image_name 
-    # done
+      local ledger_id=$(docker run -d "$image_name")
+
+      ledger_ids[i]=$ledger_id
+      sleep 3
+
+      local priv_key=$(docker exec -it "$ledger_id" cat ./ledger-node/data/config/priv_validator_key.json)
+
+      pub_keys[i]=$(trim_by_one $(echo $priv_key | jq '.pub_key.value'))
+      address_list[i]=$(trim_by_one $(echo $priv_key | jq '.address'))
+    done
+
+    local validators='[]'
+
+    for ((j = 0; j<$ledgernodes_qty; j++))
+    do
+      local current_valid_obj=$(get_validator_template ${address_list[j]} ${pub_keys[j]})
+
+      validators=$(echo $validators | jq ". + [$current_valid_obj]")
+    done
+
+    echo "Validator: $validators"
+    echo "Pub keys: ${pub_keys[@]}"
+    echo "Address list: ${address_list[@]}"
+
+
+    for ((j = 0; j<$ledgernodes_qty; j++))
+    do
+      local ledger_id=${ledger_ids[j]}
+      
+      # update genesis.json
+      docker exec -it "$ledger_id" ./ledger-node/data/config/genesis.json | jq ".validators = $validators"
+      docker stop "$ledger_id"
+      docker start "$ledger_id"
+    done
 }
 
 pure_start () {
@@ -64,10 +113,10 @@ main () {
     while [ -n "$1" ]
     do
         case "$1" in
-	        # variables
-	        --ledger-qty) ledgernodes_qty=$2 ;;
+	    # variables
+	    --ledger-qty) ledgernodes_qty=$2 ;;
 
-	        # operations
+	    # operations
             --simple) pure_start ;;
             --conf-ledger) configure_ledger_nodes ;;
             --shutdown) shutdown_environment ;;
