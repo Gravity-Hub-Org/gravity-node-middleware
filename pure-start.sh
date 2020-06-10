@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ghnode_tag='gh-node'
+ghnode_waves_tag='gh-node-waves'
 ledgernode_tag='ledger-node'
 ledgernodes_qty=5
 volumes_root=''
@@ -204,11 +205,31 @@ pure_start () {
     # grab first geth node network interface
     eth_node_ip=$(get_ethereum_node_ip_address)
 
-    docker build -f ghnode.dockerfile \
-        --build-arg ETH_ADDRESS=$eth_address \
-        --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
+     docker build -f ghnode.dockerfile \
+         --build-arg ETH_ADDRESS=$eth_address \
+         --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
 
+  
     configure_ledger_nodes
+
+    docker build -f ghnode-waves.dockerfile \
+      -t "$ghnode_waves_tag:1" .
+
+
+    docker build -f ./waves-docker-image -t waves/node .
+    docker run -d --name waves-private-node -p 6869:6869 waves/node
+
+    sleep 12
+
+    cd ./proof-of-concept/contracts/waves
+
+    if ! [ -x "$(command -v surfboard)" ]; then
+        echo 'Error: surfboard is not installed.' >&2
+    else
+        surfboard test 
+    fi
+
+    docker run "$ghnode_waves_tag:1"
 }
 
 shutdown_environment () {
