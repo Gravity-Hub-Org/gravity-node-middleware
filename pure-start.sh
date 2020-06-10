@@ -251,8 +251,6 @@ pure_start () {
          --build-arg LEDGER_URL="${rpc_urls[0]}" \
          -t "$ghnode_waves_tag:1" .
 
-    bash putch-surfboard.sh http://$waves_node_ip:6869 ./proof-of-concept/contracts/waves/surfboard.config.json
-    
     cd ./proof-of-concept/contracts/waves
 
     if ! [ -x "$(command -v surfboard)" ]; then

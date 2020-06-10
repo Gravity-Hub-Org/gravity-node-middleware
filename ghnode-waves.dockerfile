@@ -17,9 +17,7 @@ RUN apt-get update && \
     apt-get -y install gcc mono-mcs && \
     rm -rf /var/lib/apt/lists/*
 RUN npm i -g --unsafe-perm=true --allow-root @waves/surfboard
-
-RUN cd ./contracts/waves && \
-
+RUN bash putch-surfboard.sh http://$waves_node_ip:6869 ./proof-of-concept/contracts/waves/surfboard.config.json
 RUN cd ./contracts/waves && \
     surfboard test deploy.js
 
