@@ -51,7 +51,7 @@ get_validator_template() {
 
 rpc_urls=()
 p2p_urls=()
-configure_ledger_nodes (eth_node_url, waves_node_url) {
+configure_ledger_nodes () {
     # Building only once
     pub_keys=()
     address_list=()
@@ -78,8 +78,8 @@ configure_ledger_nodes (eth_node_url, waves_node_url) {
       # DEBUG:
       # docker build --no-cache -f ledgernode.dockerfile -t "$image_name" .
       docker build -f ledgernode.dockerfile \
-        --build-arg ETH_NODE_URL=$eth_node_url \
-        --build-arg WAVES_NODE_URL=$waves_node_url \ 
+        --build-arg ETH_NODE_URL=$1 \
+        --build-arg WAVES_NODE_URL=$2 \ 
         -t "$image_name" .
 
       volume_name=$(printf "%s-volume-%s" $ledgernode_tag $i)
@@ -230,7 +230,7 @@ pure_start () {
 
     if [ $ledgers_disabled -eq 0 ]; then
       sleep 3
-      configure_ledger_nodes(eth_node_ip,waves_node_ip)
+      configure_ledger_nodes eth_node_ip waves_node_ip
       sleep 5
     fi
 
