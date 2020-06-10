@@ -6,6 +6,11 @@ ledgernode_tag='ledger-node'
 ledgernodes_qty=5
 volumes_root=''
 
+ledgers_disabled=0
+
+# overriden params
+waves_node_url=''
+
 get_ethereum_node_cont_id () {
     echo $(docker ps -a | grep ethereum/client-go | awk '{ print $1 }')
 }
@@ -69,7 +74,9 @@ configure_ledger_nodes () {
 
       local image_name="$ledgernode_tag"
       # no cache for pure dir init
-      docker build --no-cache -f ledgernode.dockerfile -t "$image_name" .
+      # DEBUG:
+      # docker build --no-cache -f ledgernode.dockerfile -t "$image_name" .
+      docker build -f ledgernode.dockerfile -t "$image_name" .
 
       volume_name=$(printf "%s-volume-%s" $ledgernode_tag $i)
       volume_list[i]=$volume_name
@@ -78,7 +85,10 @@ configure_ledger_nodes () {
     
       # local ledger_id=$(docker run -d -v "$HOME/$volume_name:/proof-of-concept" "$image_name")
       # local ledger_id=$(docker run -d -v "$HOME/$volume_name:/proof-of-concept" "$image_name")
-      local ledger_id=$(docker run -d --mount source=$volume_name,destination=$HOME/$volume_name "$image_name")
+      local ledger_id=$(
+          docker run -d \
+          --mount source=$volume_name,destination=$HOME/$volume_name "$image_name"
+      )
 
       ledger_ids[i]=$ledger_id
       sleep 3
@@ -199,28 +209,37 @@ pure_start () {
     echo "Please wait up to 15 sec..."
     bash run-geth.sh
 
-    sleep 12
+    sleep 15
 
     eth_address=$(bash geth-helper.sh --node-address)
     # grab first geth node network interface
     eth_node_ip=$(get_ethereum_node_ip_address)
 
-     docker build -f ghnode.dockerfile \
+    echo "ETH Address: $eth_address"
+    echo "ETH Node IP: $eth_node_ip"
+
+    docker build -f ghnode.dockerfile \
          --build-arg ETH_ADDRESS=$eth_address \
          --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
-
-  
-    configure_ledger_nodes
 
     docker build -f ghnode-waves.dockerfile \
       -t "$ghnode_waves_tag:1" .
 
-
     docker build -f ./waves-docker-image -t waves/node .
-    docker run -d --name waves-private-node -p 6869:6869 waves/node
 
-    sleep 12
+    echo "Start waves node..."
 
+    docker pull wavesplatform/node
+    local waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 wavesplatform/node)
+    # override
+    waves_node_url=$(get_container_ip "$waves_node_cont")
+
+    if [ $ledgers_disabled -eq 0 ]; then
+      sleep 3
+      configure_ledger_nodes 
+      sleep 5
+    fi
+ 
     cd ./proof-of-concept/contracts/waves
 
     if ! [ -x "$(command -v surfboard)" ]; then
@@ -229,7 +248,9 @@ pure_start () {
         surfboard test 
     fi
 
-    docker run "$ghnode_waves_tag:1"
+    docker run -d -p 26668:26657 "$ghnode_waves_tag:1"
+
+    docker run -d -p 26669:26657 "$ghnode_tag:1"
 }
 
 shutdown_environment () {
@@ -237,7 +258,17 @@ shutdown_environment () {
 
     # docker stop $eth_node_id
     # docker rm $eth_node_id
-    echo "Shut down..."
+    echo "Shutting down all ledger nodes..."
+    docker ps -a | grep "$ledgernode_tag" | awk '{ print $1 }' | xargs -L1 docker stop  
+
+    echo "Dropping all ledger nodes..."
+    docker ps -a | grep "$ledgernode_tag" | awk '{ print $1 }' | xargs -L1 docker rm
+
+    echo "Shutting down all gh nodes..."
+    docker ps -a | grep "$ghnode_tag" |  awk '{ print $1 }' | xargs -L1 docker stop  
+
+    echo "Dropping all gh nodes..."
+    docker ps -a | grep "$ghnode_tag"  awk '{ print $1 }' | xargs -L1 docker stop  
 }
 
 # Sig kill handler
@@ -249,6 +280,7 @@ main () {
         case "$1" in
 	    # variables
 	    --ledger-qty) ledgernodes_qty=$2 ;;
+            --no-ledger) ledgers_disabled=1 ;;
 
 	    # operations
             --simple) pure_start ;;

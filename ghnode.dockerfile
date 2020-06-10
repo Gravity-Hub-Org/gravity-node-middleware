@@ -22,7 +22,7 @@ ARG ETH_ADDRESS=idk
 RUN cd ./contracts/ethereum && \
     bash patcher.sh --eth-network $ETH_NETWORK --eth-address $ETH_ADDRESS && \
     cat truffle-config.js && sleep 1 && \
-    truffle migrate --network external >> migration.txt
+    truffle migrate --network external | tee migration.txt
 
 RUN echo "Migration file: \n" && cat ./contracts/ethereum/migration.txt
 
