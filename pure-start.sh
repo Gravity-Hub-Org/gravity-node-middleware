@@ -221,7 +221,7 @@ pure_start () {
       sleep 5
     fi
 
-    eth_address=$(bash geth-helper.sh --node-address)
+    eth_address="0x05554B4434492173957121f790dcb0f112bC5A12"
     # grab first geth node network interface
     eth_node_ip=$(get_ethereum_node_ip_address)
 
@@ -230,15 +230,15 @@ pure_start () {
 
     docker build -f ghnode.dockerfile \
          --build-arg ETH_ADDRESS=$eth_address \
-         --build-arg NATIVE_URL="http://$eth_node_ip:8545" \
-         --build-arg ETH_NODE_URL="${rpc_urls[0]}" \
+         --build-arg NODE_URL="http://$eth_node_ip:8545" \
+         --build-arg LEDGER_URL="${rpc_urls[0]}" \
          --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
 
     docker build -f ./waves-docker-image -t waves/node .
 
     docker build -f ghnode-waves.dockerfile \
-         --build-arg NATIVE_URL="http://$waves_node_ip:6869" \
-         --build-arg NODE_URL="${rpc_urls[0]}" \
+         --build-arg NODE_URL="http://$waves_node_ip:6869" \
+         --build-arg LEDGER_URL="${rpc_urls[0]}" \
          -t "$ghnode_waves_tag:1" .
 
     echo "Start waves node..."

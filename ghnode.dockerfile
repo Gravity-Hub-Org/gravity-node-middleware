@@ -18,8 +18,8 @@ RUN npm i -g --unsafe-perm=true --allow-root truffle
 # Set args
 ARG ETH_NETWORK=0.0.0.0
 ARG ETH_ADDRESS=idk
-ARG NATIVE_URL=idk
-ARG ETH_NODE_URL=http://127.0.0.1:8545
+ARG LEDGER_URL=idk
+ARG NODE_URL=http://127.0.0.1:8545
 
 RUN cd ./contracts/ethereum && \
     bash patcher.sh --eth-network $ETH_NETWORK --eth-address $ETH_ADDRESS && \
@@ -34,9 +34,9 @@ RUN export NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-address.txt) && \
     cd ./gh-node && ls -la && \
     echo "Nebula address: $NEBULA_ADDRESS" && \
     rm config.json && \
-    bash build-conf.sh --nebula $NEBULA_ADDRESS --node-url $ETH_NODE_URL \
-       --native-url $NATIVE_URL && \ 
+    bash build-conf.sh --nebula $NEBULA_ADDRESS --node-url $NODE_URL \
+       --native-url $LEDGER_URL && \ 
     echo "CONFIG" && cat config.json && \
     go build
 
-ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json"
+ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json" --key "fc7f145547d4e4dba155cc8f3b77b447c68a0afb4203c91a5a99bea9f4339690"
