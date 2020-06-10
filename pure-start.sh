@@ -7,6 +7,7 @@ ledgernodes_qty=5
 volumes_root=''
 
 ledgers_disabled=0
+eth_node_conf_disabled=0
 
 # overriden params
 waves_node_url=''
@@ -48,13 +49,13 @@ get_validator_template() {
     ' "$1" "$2"
 }
 
+rpc_urls=()
+p2p_urls=()
 configure_ledger_nodes () {
     # Building only once
     pub_keys=()
     address_list=()
     ledger_ids=()
-    rpc_urls=()
-    p2p_urls=()
     volume_list=()
 
     # the ports for communication
@@ -207,9 +208,18 @@ pure_start () {
     # start geth
     echo "Starting Ethereum node in dev mode..."
     echo "Please wait up to 15 sec..."
-    bash run-geth.sh
 
-    sleep 15
+    if [ $eth_node_conf_disabled -eq 0 ]; then
+      bash run-geth.sh
+
+      sleep 15
+    fi
+
+    if [ $ledgers_disabled -eq 0 ]; then
+      sleep 3
+      configure_ledger_nodes 
+      sleep 5
+    fi
 
     eth_address=$(bash geth-helper.sh --node-address)
     # grab first geth node network interface
@@ -220,10 +230,9 @@ pure_start () {
 
     docker build -f ghnode.dockerfile \
          --build-arg ETH_ADDRESS=$eth_address \
+         --build-arg NATIVE_URL="http://$eth_node_ip:8545" \
+         --build-arg ETH_NODE_URL="${rpc_urls[0]}" \
          --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
-
-    docker build -f ghnode-waves.dockerfile \
-      -t "$ghnode_waves_tag:1" .
 
     docker build -f ./waves-docker-image -t waves/node .
 
@@ -232,14 +241,13 @@ pure_start () {
     docker pull wavesplatform/node
     local waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 wavesplatform/node)
     # override
-    waves_node_url=$(get_container_ip "$waves_node_cont")
-
-    if [ $ledgers_disabled -eq 0 ]; then
-      sleep 3
-      configure_ledger_nodes 
-      sleep 5
-    fi
+    waves_node_ip=$(get_container_ip "$waves_node_cont")
  
+    docker build -f ghnode-waves.dockerfile \
+         --build-arg NATIVE_URL="http://$waves_node_ip:6869" \
+         --build-arg NODE_URL="${rpc_urls[0]}" \
+         -t "$ghnode_waves_tag:1" .
+
     cd ./proof-of-concept/contracts/waves
 
     if ! [ -x "$(command -v surfboard)" ]; then
@@ -248,6 +256,7 @@ pure_start () {
         surfboard test 
     fi
 
+    
     docker run -d -p 26668:26657 "$ghnode_waves_tag:1"
 
     docker run -d -p 26669:26657 "$ghnode_tag:1"
@@ -281,6 +290,7 @@ main () {
 	    # variables
 	    --ledger-qty) ledgernodes_qty=$2 ;;
             --no-ledger) ledgers_disabled=1 ;;
+            --no-eth) eth_node_conf_disabled=1 ;;
 
 	    # operations
             --simple) pure_start ;;
