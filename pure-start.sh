@@ -234,7 +234,7 @@ pure_start () {
          --build-arg LEDGER_URL="${rpc_urls[0]}" \
          --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
 
-    docker build -f ./waves-docker-image/Dockerfile -t waves/node .
+    docker build -f ./waves-image/Dockerfile -t waves/node .
 
     docker build -f ghnode-waves.dockerfile \
          --build-arg NODE_URL="http://$waves_node_ip:6869" \
