@@ -43,24 +43,6 @@ get_validator_template() {
     ' "$1" "$2"
 }
 
-trim_by_one () {
-    echo $1 | head -c -2 | tail -c +2
-}
-
-get_validator_template() {
-    printf '
-    {
-      "address": "%s",
-      "pub_key": {
-        "type": "tendermint/PubKeyEd25519",
-        "value": "%s"
-      },
-      "power": "10",
-      "name": ""
-    }
-    ' "$1" "$2"
-}
-
 configure_ledger_nodes () {
     # Building only once
     pub_keys=()
@@ -240,7 +222,12 @@ pure_start () {
     sleep 12
 
     cd ./proof-of-concept/contracts/waves
-    surfboard test 
+
+    if ! [ -x "$(command -v surfboard)" ]; then
+        echo 'Error: surfboard is not installed.' >&2
+    else
+        surfboard test 
+    fi
 
     docker run "$ghnode_waves_tag:1"
 }
