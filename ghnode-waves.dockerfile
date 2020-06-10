@@ -12,9 +12,16 @@ ARG LEDGER_URL="blank"
 # Deps
 RUN apt-get install bash
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install -y nodejs && curl -L https://npmjs.org/install.sh | sh
 RUN apt-get update && \
     apt-get -y install gcc mono-mcs && \
     rm -rf /var/lib/apt/lists/*
+RUN npm i -g --unsafe-perm=true --allow-root @waves/surfboard
+
+RUN cd ./contracts/waves && \
+
+RUN cd ./contracts/waves && \
+    surfboard test deploy.js
 
 RUN cd ./gh-node && \
     bash build-conf-waves.sh --node-url $NODE_URL --native-url $LEDGER_URL && \

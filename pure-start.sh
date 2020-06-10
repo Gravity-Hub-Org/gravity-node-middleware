@@ -51,7 +51,7 @@ get_validator_template() {
 
 rpc_urls=()
 p2p_urls=()
-configure_ledger_nodes () {
+configure_ledger_nodes (eth_node_url, waves_node_url) {
     # Building only once
     pub_keys=()
     address_list=()
@@ -77,7 +77,10 @@ configure_ledger_nodes () {
       # no cache for pure dir init
       # DEBUG:
       # docker build --no-cache -f ledgernode.dockerfile -t "$image_name" .
-      docker build -f ledgernode.dockerfile -t "$image_name" .
+      docker build -f ledgernode.dockerfile \
+        --build-arg ETH_NODE_URL=$eth_node_url \
+        --build-arg WAVES_NODE_URL=$waves_node_url \ 
+        -t "$image_name" .
 
       volume_name=$(printf "%s-volume-%s" $ledgernode_tag $i)
       volume_list[i]=$volume_name
@@ -215,15 +218,24 @@ pure_start () {
       sleep 15
     fi
 
+    eth_node_ip=$(get_ethereum_node_ip_address)
+
+    cd ./waves-image && docker build . -t waves-node && cd ..
+
+    echo "Start waves node..."
+
+    local waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 waves-node)
+    # override
+    waves_node_ip=$(get_container_ip "$waves_node_cont")
+
     if [ $ledgers_disabled -eq 0 ]; then
       sleep 3
-      configure_ledger_nodes 
+      configure_ledger_nodes(eth_node_ip,waves_node_ip)
       sleep 5
     fi
 
     eth_address="0x05554B4434492173957121f790dcb0f112bC5A12"
     # grab first geth node network interface
-    eth_node_ip=$(get_ethereum_node_ip_address)
 
     echo "ETH Address: $eth_address"
     echo "ETH Node IP: $eth_node_ip"
@@ -234,19 +246,13 @@ pure_start () {
          --build-arg LEDGER_URL="${rpc_urls[0]}" \
          --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
 
-    cd ./waves-image && docker build . -t waves-node && cd ..
-
     docker build -f ghnode-waves.dockerfile \
          --build-arg NODE_URL="http://$waves_node_ip:6869" \
          --build-arg LEDGER_URL="${rpc_urls[0]}" \
          -t "$ghnode_waves_tag:1" .
 
-    echo "Start waves node..."
-
-    local waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 waves-node)
-    # override
-    waves_node_ip=$(get_container_ip "$waves_node_cont")
- 
+    bash putch-surfboard.sh http://$waves_node_ip:6869 ./proof-of-concept/contracts/waves/surfboard.config.json
+    
     cd ./proof-of-concept/contracts/waves
 
     if ! [ -x "$(command -v surfboard)" ]; then
