@@ -236,17 +236,17 @@ pure_start () {
 
     docker build -f ./waves-docker-image -t waves/node .
 
+    docker build -f ghnode-waves.dockerfile \
+         --build-arg NATIVE_URL="http://$waves_node_ip:6869" \
+         --build-arg NODE_URL="${rpc_urls[0]}" \
+         -t "$ghnode_waves_tag:1" .
+
     echo "Start waves node..."
 
     local waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 waves/node)
     # override
     waves_node_ip=$(get_container_ip "$waves_node_cont")
  
-    docker build -f ghnode-waves.dockerfile \
-         --build-arg NATIVE_URL="http://$waves_node_ip:6869" \
-         --build-arg NODE_URL="${rpc_urls[0]}" \
-         -t "$ghnode_waves_tag:1" .
-
     cd ./proof-of-concept/contracts/waves
 
     if ! [ -x "$(command -v surfboard)" ]; then
