@@ -19,7 +19,7 @@ RUN apt-get update && \
     npm install @waves/surfboard 
     
 RUN npm i -g --unsafe-perm=true --allow-root @waves/surfboard
-RUN bash putch-surfboard.sh http://$waves_node_ip:6869 ./proof-of-concept/contracts/waves/surfboard.config.json
+RUN cd ./contracts/waves && bash patch-surfboard.sh http://$waves_node_ip:6869 surfboard.config.json
 RUN cd ./contracts/waves && \
     surfboard test deploy.js
 
