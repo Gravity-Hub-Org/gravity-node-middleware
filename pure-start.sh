@@ -238,8 +238,7 @@ pure_start () {
 
     echo "Start waves node..."
 
-    docker pull wavesplatform/node
-    local waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 wavesplatform/node)
+    local waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 waves/node)
     # override
     waves_node_ip=$(get_container_ip "$waves_node_cont")
  

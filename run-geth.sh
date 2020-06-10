@@ -3,6 +3,25 @@
 address_qty=0
 
 simple_start () {
+    
+    echo '{
+        "config": {
+            "chainId": 15,
+            "homesteadBlock": 0,
+            "eip155Block": 0,
+            "eip158Block": 0
+        },
+        "difficulty": "200000000",
+        "gasLimit": "2100000",
+        "alloc": {
+            "7df9a875a174b3bc565e6424a0050ebc1b2d1d82": { "balance": "100000000000000000000000" },
+            "f41c74c9ae680c1aa78f42e5647a62f353b7bdde": { "balance": "100000000000000000000000" },
+            "f41c74c9ae680c1aa78f42e5647a62f353b7bdde": { "balance": "100000000000000000000000" },
+            "f41c74c9ae680c1aa78f42e5647a62f353b7bdde": { "balance": "100000000000000000000000" },
+            "f41c74c9ae680c1aa78f42e5647a62f353b7bdde": { "balance": "100000000000000000000000" },
+        }
+    }' > $HOME/ethereum:/root/genesis.json
+
     docker run -d --name ethereum-node -v $HOME/ethereum:/root \
             -p 8545:8545 -p 30303:30303 \
             ethereum/client-go --dev --rpcapi="db,eth,net,web3,personal,web3" --rpc --rpcaddr '0.0.0.0' \
