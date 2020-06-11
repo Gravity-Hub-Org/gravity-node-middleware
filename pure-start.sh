@@ -231,7 +231,7 @@ pure_start () {
     return
     if [ $ledgers_disabled -eq 0 ]; then
       sleep 3
-      configure_ledger_nodes eth_node_ip waves_node_ip
+      configure_ledger_nodes $eth_node_ip $waves_node_ip
       sleep 5
     fi
 
