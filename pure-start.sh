@@ -160,6 +160,7 @@ configure_ledger_nodes () {
       # rm temp.json
       
       echo "Node #$((j+1)) genesis.json updated"
+      echo $genesis_file_url
       # docker exec -it "$ledger_id" cat "$genesis_file_url"
       # sed 's/seeds\ =\ \"\"/seeds\ =\"like\"/' tendermint-template.toml 
 
@@ -227,6 +228,8 @@ pure_start () {
     # override
     waves_node_ip=$(get_container_ip "$waves_node_cont")
     
+    sleep 10
+
     if [ $ledgers_disabled -eq 0 ]; then
       sleep 3
       configure_ledger_nodes $eth_node_ip $waves_node_ip
