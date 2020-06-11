@@ -15,7 +15,6 @@ COPY toml-patcher.sh /proof-of-concept/toml-patcher.sh
 COPY pure-start.sh /proof-of-concept/pure-start.sh
 
 COPY tendermint-template.toml /proof-of-concept/tendermint-template.toml
-COPY --from=tendermint /var/www/tendermint /proof-of-concept/ledger-node/data
 
 RUN bash toml-patcher.sh -i tendermint-template.toml -o config.toml \
     --pairs "ethNodeUrl;${ETH_NODE_URL},wavesNodeUrl;${WAVES_NODE_URL}"
