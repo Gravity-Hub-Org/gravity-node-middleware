@@ -8,9 +8,6 @@
 
 ##### main base config options #####
 
-ethNodeUrl
-wavesNodeUrl
-
 # TCP or UNIX socket address of the ABCI application,
 # or the name of an ABCI application compiled in with the Tendermint binary
 proxy_app = "tcp://127.0.0.1:26658"
@@ -336,4 +333,3 @@ max_open_connections = 3
 
 # Instrumentation namespace
 namespace = "tendermint"
-
