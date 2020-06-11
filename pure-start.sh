@@ -41,6 +41,8 @@ configure_ledger_nodes () {
     # Building only once
     ledger_ids=()
     volume_list=()
+    pub_keys=()
+    address_list=()
 
     # the ports for communication
     rpc_port=26657
@@ -78,14 +80,50 @@ configure_ledger_nodes () {
       )
 
       ledger_ids[i]=$ledger_id
+      
       sleep 3
+
+      local priv_key=$(docker exec -it "$ledger_id" cat ./ledger-node/data/config/priv_validator_key.json)
+
+      pub_keys[i]=$(trim_by_one $(echo $priv_key | jq '.pub_key.value'))
+      address_list[i]=$(trim_by_one $(echo $priv_key | jq '.address'))
     done
 
-    # starting nodes from 1 to n 
+    for ((j = 0; j<$ledgernodes_qty; j++))
+    do
+        local current_valid_obj=$(get_validator_template ${address_list[j]} ${pub_keys[j]})
+        local ledger_id=${ledger_ids[j]}
+        # update rpc & p2p urls
+        # cont_ip - just ip
+        local cont_ip=$(get_container_ip $ledger_id)
+        rpc_urls[j]="http://$cont_ip:$rpc_port"
+        p2p_urls[j]="http://$cont_ip:$p2p_port"
+
+      
+        if [[ j -gt 0 ]]
+        then
+            seeds_list+=','
+        fi
+
+        seed_address=$(echo ${p2p_urls[j]} | sed 's/tcp:\/\///')
+        seeds_list+="\"${address_list[j]}@$seed_address\""
+
+        validators=$(echo $validators | jq ". + [$current_valid_obj]")
+    done
+
     for ((j = 0; j<$ledgernodes_qty; j++))
     do
       local ledger_id=${ledger_ids[j]}
       docker start "$ledger_id"
+    done
+
+    
+    for ((j = 0; j<$ledgernodes_qty; j++))
+    do
+        url="${rpc_urls[j]}/dial_peers?persistent=true&peers=\[${seeds_list}\]"
+        
+        echo url
+        docker exec ${ledger_ids[j]} curl '$'
     done
 }
 
