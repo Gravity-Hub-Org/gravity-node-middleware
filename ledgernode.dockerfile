@@ -11,7 +11,7 @@ USER root
 
 WORKDIR /proof-of-concept
 
-ARG VALIDATOR_INDEX=1
+ARG VALIDATOR_INDEX=0
 ARG ETH_NODE_URL="http://localhost:8545"
 ARG WAVES_NODE_URL="https://nodes-stagenet.wavesnodes.com"
 
