@@ -226,8 +226,7 @@ pure_start () {
     waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 waves-node)
     # override
     waves_node_ip=$(get_container_ip "$waves_node_cont")
-    echo waves_node_ip
-    return
+    
     if [ $ledgers_disabled -eq 0 ]; then
       sleep 3
       configure_ledger_nodes $eth_node_ip $waves_node_ip
