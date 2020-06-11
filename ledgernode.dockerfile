@@ -30,7 +30,11 @@ RUN bash toml-patcher.sh -i tendermint-template.toml -o config.toml \
 COPY ./ledger-config/genesis.json ./ledger-node/data/config/genesis.json
 COPY ./ledger-config/priv_validator_key_${VALIDATOR_INDEX}.json ./ledger-node/data/config/priv_validator_key.json
 RUN mv config.toml ./ledger-node/data/config/
+
+WORKDIR /var/www/tendermint
 RUN tendermint init --home  ./ledger-node/data/config/
+WORKDIR /proof-of-concept
+
 
 RUN apt-get update && \
     apt-get -y install gcc mono-mcs
