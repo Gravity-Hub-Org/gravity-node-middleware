@@ -212,13 +212,12 @@ pure_start () {
     echo "Starting Ethereum node in dev mode..."
     echo "Please wait up to 15 sec..."
 
-  #  if [ $eth_node_conf_disabled -eq 0 ]; then
-  #    bash run-geth.sh
-#
-#      sleep 15
-#    fi
+    if [ $eth_node_conf_disabled -eq 0 ]; then
+      bash run-geth.sh
+      sleep 15
+    fi
 
-#    eth_node_ip=$(get_ethereum_node_ip_address)
+    eth_node_ip=$(get_ethereum_node_ip_address)
 
     cd ./waves-image && docker build . -t waves-node && cd ..
 
