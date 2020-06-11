@@ -4,7 +4,7 @@ USER root
 WORKDIR /var/www/tendermint
 
 RUN chmod -R 777 .
-RUN tendermint init --home /proof-of-concept/ledger-node/data/
+RUN tendermint init --home .
 
 FROM golang:1.14-buster as ledger-node
 
@@ -30,7 +30,6 @@ RUN bash toml-patcher.sh -i tendermint-template.toml -o config.toml \
 
 COPY ./ledger-config/genesis.json ./ledger-node/data/config/genesis.json
 COPY ./ledger-config/priv_validator_key_${VALIDATOR_INDEX}.json ./ledger-node/data/config/priv_validator_key.json
-COPY ./ledger-config/priv_validator_state.json ./ledger-node/data/data/priv_validator_state.json
 RUN mv config.toml ./ledger-node/data/config/
 
 RUN apt-get update && \
