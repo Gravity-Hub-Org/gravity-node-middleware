@@ -79,7 +79,7 @@ configure_ledger_nodes () {
       # docker build --no-cache -f ledgernode.dockerfile -t "$image_name" .
       docker build -f ledgernode.dockerfile \
         --build-arg ETH_NODE_URL=$1 \
-        --build-arg WAVES_NODE_URL=$2 \ 
+        --build-arg WAVES_NODE_URL=$2 \
         -t "$image_name" .
 
       volume_name=$(printf "%s-volume-%s" $ledgernode_tag $i)
