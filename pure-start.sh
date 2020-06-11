@@ -212,22 +212,23 @@ pure_start () {
     echo "Starting Ethereum node in dev mode..."
     echo "Please wait up to 15 sec..."
 
-    if [ $eth_node_conf_disabled -eq 0 ]; then
-      bash run-geth.sh
+  #  if [ $eth_node_conf_disabled -eq 0 ]; then
+  #    bash run-geth.sh
+#
+#      sleep 15
+#    fi
 
-      sleep 15
-    fi
-
-    eth_node_ip=$(get_ethereum_node_ip_address)
+#    eth_node_ip=$(get_ethereum_node_ip_address)
 
     cd ./waves-image && docker build . -t waves-node && cd ..
 
     echo "Start waves node..."
 
-    local waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 waves-node)
+    waves_node_cont=$(docker run -d --name waves-private-node -p 6869:6869 waves-node)
     # override
     waves_node_ip=$(get_container_ip "$waves_node_cont")
-
+    echo waves_node_ip
+    return
     if [ $ledgers_disabled -eq 0 ]; then
       sleep 3
       configure_ledger_nodes eth_node_ip waves_node_ip
@@ -251,15 +252,6 @@ pure_start () {
          --build-arg LEDGER_URL="${rpc_urls[0]}" \
          -t "$ghnode_waves_tag:1" .
 
-    cd ./proof-of-concept/contracts/waves
-
-    if ! [ -x "$(command -v surfboard)" ]; then
-        echo 'Error: surfboard is not installed.' >&2
-    else
-        surfboard test 
-    fi
-
-    
     docker run -d -p 26668:26657 "$ghnode_waves_tag:1"
 
     docker run -d -p 26669:26657 "$ghnode_tag:1"
