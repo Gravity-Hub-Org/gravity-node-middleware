@@ -122,8 +122,8 @@ configure_ledger_nodes () {
     do
         url="${rpc_urls[j]}/dial_peers?persistent=true&peers=\[${seeds_list}\]"
         
-        echo url
-        docker exec ${ledger_ids[j]} curl '$'
+        echo $url
+        docker exec ${ledger_ids[j]} curl $url
     done
 }
 
