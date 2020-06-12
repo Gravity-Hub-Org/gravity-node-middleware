@@ -39,4 +39,4 @@ RUN export NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-address.txt) && \
     echo "CONFIG" && cat config.json && \
     go build
 
-ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json" --key "0xfc7f145547d4e4dba155cc8f3b77b447c68a0afb4203c91a5a99bea9f4339690"
+ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json" --key "fc7f145547d4e4dba155cc8f3b77b447c68a0afb4203c91a5a99bea9f4339690"
