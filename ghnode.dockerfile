@@ -30,7 +30,7 @@ RUN echo "Migration file: \n" && cat ./contracts/ethereum/migration.txt
 
 RUN cd ./contracts/ethereum && cat migration.txt | bash address-extractor.sh >> nebula-address.txt
 
-RUN export NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-address.txt) && \
+RUN export NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-address.txt | tail -c +3) && \
     cd ./gh-node && ls -la && \
     echo "Nebula address: $NEBULA_ADDRESS" && \
     rm config.json && \
