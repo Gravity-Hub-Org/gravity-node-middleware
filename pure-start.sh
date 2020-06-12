@@ -60,6 +60,8 @@ configure_ledger_nodes () {
       # local tag="1.$((i+1))"
 
       local image_name="$ledgernode_tag"
+
+      echo "ETH_NODE_URL: $1; WAVES_NODE_URL: $2; VALIDATOR_INDEX: $i"
       # no cache for pure dir init
       # DEBUG:
       # docker build --no-cache -f ledgernode.dockerfile -t "$image_name" .
@@ -86,12 +88,17 @@ configure_ledger_nodes () {
       local priv_key=$(docker exec -it "$ledger_id" cat ./ledger-node/data/config/priv_validator_key.json)
 
       pub_keys[i]=$(trim_by_one $(echo $priv_key | jq '.pub_key.value'))
-      address_list[i]=$(trim_by_one $(echo $priv_key | jq '.address'))
+
+      local ledger_ip=$(get_container_ip $ledger_id)
+      local ledger_status=$(curl -X GET "http://$ledger_ip:26657/status")
+      address_list[i]=$(trim_by_one $(echo $ledger_status | jq '.result.node_info.id'))
+
+      echo "Ledger ip: $ledger_ip; Ledger ID: ${address_list[i]}"
     done
 
     for ((j = 0; j<$ledgernodes_qty; j++))
     do
-        local current_valid_obj=$(get_validator_template ${address_list[j]} ${pub_keys[j]})
+        # local current_valid_obj=$(get_validator_template ${address_list[j]} ${pub_keys[j]})
         local ledger_id=${ledger_ids[j]}
         # update rpc & p2p urls
         # cont_ip - just ip
@@ -108,7 +115,7 @@ configure_ledger_nodes () {
         seed_address=$(echo ${p2p_urls[j]})
         seeds_list+="\"${address_list[j]}@$seed_address\""
 
-        validators=$(echo $validators | jq ". + [$current_valid_obj]")
+        # validators=$(echo $validators | jq ". + [$current_valid_obj]")
     done
 
     for ((j = 0; j<$ledgernodes_qty; j++))
@@ -117,7 +124,6 @@ configure_ledger_nodes () {
       docker start "$ledger_id"
     done
 
-    
     for ((j = 0; j<$ledgernodes_qty; j++))
     do
         url="${rpc_urls[j]}/dial_peers?persistent=true&peers=\[${seeds_list}\]"
