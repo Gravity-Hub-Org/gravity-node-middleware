@@ -168,7 +168,7 @@ pure_start () {
     echo "ETH Node IP: $eth_node_ip"
 
     docker build -f ghnode.dockerfile \
-         --build-arg ETH_ADDRESS=$eth_address \
+         --build-arg ETH_ADDRESS=$(echo $eth_address | tail -c +3) \
          --build-arg NODE_URL="http://$eth_node_ip:8545" \
          --build-arg LEDGER_URL="${rpc_urls[0]}" \
          --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
