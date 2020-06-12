@@ -96,8 +96,8 @@ configure_ledger_nodes () {
         # update rpc & p2p urls
         # cont_ip - just ip
         local cont_ip=$(get_container_ip $ledger_id)
-        rpc_urls[j]="http://$cont_ip:$rpc_port"
-        p2p_urls[j]="http://$cont_ip:$p2p_port"
+        rpc_urls[j]="$cont_ip:$rpc_port"
+        p2p_urls[j]="$cont_ip:$p2p_port"
 
       
         if [[ j -gt 0 ]]
@@ -105,7 +105,7 @@ configure_ledger_nodes () {
             seeds_list+=','
         fi
 
-        seed_address=$(echo ${p2p_urls[j]} | sed 's/tcp:\/\///')
+        seed_address=$(echo ${p2p_urls[j]})
         seeds_list+="\"${address_list[j]}@$seed_address\""
 
         validators=$(echo $validators | jq ". + [$current_valid_obj]")
