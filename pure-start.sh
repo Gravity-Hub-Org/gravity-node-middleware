@@ -178,9 +178,16 @@ pure_start () {
          --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
          -t "$ghnode_waves_tag:1" .
 
-    docker run -d -p 26668:26657 "$ghnode_waves_tag:1"
+    eth_gh_node_vol="ghnode-eth-1"
+    waves_gh_node_vol="ghnode-waves-1"
 
-    docker run -d -p 26669:26657 "$ghnode_tag:1"
+    docker run -d -p 26668:26657 \
+         --mount source=$waves_gh_node_vol,destination=$HOME/$waves_gh_node_vol \
+         "$ghnode_waves_tag:1"
+
+    docker run -d -p 26669:26657 \
+         --mount source=$eth_gh_node_vol,destination=$HOME/$eth_gh_node_vol \
+         "$ghnode_tag:1"
 }
 
 shutdown_environment () {
