@@ -195,8 +195,13 @@ shutdown_environment () {
     docker ps -a | grep "$ghnode_tag"  awk '{ print $1 }' | xargs -L1 docker stop  
 }
 
+drop_all_containers () {
+    docker ps -a | awk '{ print $1 }' | xargs -L1 docker stop
+    docker ps -a | awk '{ print $1 }' | xargs -L1 docker rm
+}
+
 # Sig kill handler
-trap 'echo "Terminating environment..."; shutdown_environment' SIGINT
+trap 'echo "Terminating environment..."; shutdown_environment; exit 0' SIGINT
 
 main () {
     while [ -n "$1" ]
@@ -215,6 +220,9 @@ main () {
             # misc
             --get-eth-node-id) echo $(get_ethereum_node_cont_id) ;;
             --get-current-ip) echo $(get_current_env_ip) ;;
+         
+            # distinct helpers
+            --drop-all) drop_all_containers; exit 0 ;;
         esac
         shift
     done
