@@ -173,17 +173,29 @@ pure_start () {
          --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
          --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
 
-    docker build -f ghnode-waves.dockerfile \
-         --build-arg NODE_URL="http://$waves_node_ip:6869" \
-         --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
-         -t "$ghnode_waves_tag:1" .
+    priv_keys_waves=("waves private node seed with waves tokens1" 
+                    "waves private node seed with waves tokens2" 
+                    "waves private node seed with waves tokens3"
+                    "waves private node seed with waves tokens4" 
+                    "waves private node seed with waves tokens5")
 
-    eth_gh_node_vol="ghnode-eth-1"
+                  
     waves_gh_node_vol="ghnode-waves-1"
 
-    docker run -d -p 26668:26657 \
+    for ((j = 0; j<5; j++))
+    do
+        docker build -f ghnode-waves.dockerfile \
+         --build-arg NODE_URL="http://$waves_node_ip:6869" \
+         --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
+         --build-arg KEY=$priv_keys_waves[j] \
+         -t "$ghnode_waves_tag:$j" .
+        
+        docker run -d -p 26668:26657 \
          --mount source=$waves_gh_node_vol,destination=$HOME/$waves_gh_node_vol \
-         "$ghnode_waves_tag:1"
+         "$ghnode_waves_tag:$j"
+    done 
+   
+    eth_gh_node_vol="ghnode-eth-1"
 
     docker run -d -p 26669:26657 \
          --mount source=$eth_gh_node_vol,destination=$HOME/$eth_gh_node_vol \
