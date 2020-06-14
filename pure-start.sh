@@ -190,7 +190,7 @@ pure_start () {
         --build-arg KEY="${priv_keys_waves[j]}" \
         -t "$ghnode_waves_tag:$j" .
         
-        docker run -d -p 26668:26657 \
+        docker run -d \
          --mount source=$waves_gh_node_vol,destination=$HOME/$waves_gh_node_vol \
          "$ghnode_waves_tag:$j"
     done 
