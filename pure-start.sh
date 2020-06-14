@@ -4,6 +4,7 @@ ghnode_tag='gh-node'
 ghnode_waves_tag='gh-node-waves'
 ledgernode_tag='ledger-node'
 ledgernodes_qty=5
+gh_eth_nodes_qty=5
 volumes_root=''
 
 ledgers_disabled=0
@@ -167,27 +168,43 @@ pure_start () {
     echo "ETH Address: $eth_address"
     echo "ETH Node IP: $eth_node_ip"
 
-    docker build -f ghnode.dockerfile \
-         --build-arg ETH_ADDRESS=$eth_address \
-         --build-arg NODE_URL="http://$eth_node_ip:8545" \
-         --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
-         --build-arg ETH_NETWORK=$eth_node_ip -t "$ghnode_tag:1" .
+    # eth_gh_node_vol="ghnode-eth-1"
+    # waves_gh_node_vol="ghnode-waves-1"
+  
+    # docker volume create "$eth_gh_node_vol"
+    # docker volume create "$waves_gh_node_vol"
 
+    # Building 5 eth gh nodes
+    # gh_eth_nodes_qty 
+    for ((i = 0; i < $gh_eth_nodes_qty; i++))
+    do
+        local tail_arg="+$((i+1))"
+        local private_key=$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f2 | tail -n "$tail_arg" | head -n1)
+        # local address_list=$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f1 | sed 's/\(.*\)/"\1"/g' |  tr '\n' ',')
+        local address_list=$(echo "[$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f1 | sed 's/\(.*\)/"\1"/g' |  tr '\n' ',')]")
+        echo "Address list for GH ETH node deployment: $address_list"
+        echo "Private key for node #1: $private_key"
+        
+        docker build --no-cache -f ghnode.dockerfile \
+             --build-arg ETH_ADDRESS=$address_list \
+             --build-arg NODE_URL="http://$eth_node_ip:8545" \
+             --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
+             --build-arg ETH_NETWORK=$eth_node_ip \
+             --build-arg RUN_KEY=$private_key -t "$ghnode_tag:1" .
+
+        # docker run -d -p 26669:26657 \
+        docker run -d "$ghnode_tag:1"
+    done
+
+    # Running 5 eth gh nodes
     docker build -f ghnode-waves.dockerfile \
          --build-arg NODE_URL="http://$waves_node_ip:6869" \
          --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
          -t "$ghnode_waves_tag:1" .
 
-    eth_gh_node_vol="ghnode-eth-1"
-    waves_gh_node_vol="ghnode-waves-1"
-
     docker run -d -p 26668:26657 \
          --mount source=$waves_gh_node_vol,destination=$HOME/$waves_gh_node_vol \
          "$ghnode_waves_tag:1"
-
-    docker run -d -p 26669:26657 \
-         --mount source=$eth_gh_node_vol,destination=$HOME/$eth_gh_node_vol \
-         "$ghnode_tag:1"
 }
 
 shutdown_environment () {

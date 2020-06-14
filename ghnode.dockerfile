@@ -20,6 +20,7 @@ ARG ETH_NETWORK=0.0.0.0
 ARG ETH_ADDRESS=idk
 ARG LEDGER_URL=idk
 ARG NODE_URL=http://127.0.0.1:8545
+ARG RUN_KEY='fc7f145547d4e4dba155cc8f3b77b447c68a0afb4203c91a5a99bea9f4339690'
 
 RUN cd ./contracts/ethereum && \
     bash patcher.sh --eth-network $ETH_NETWORK --eth-address $ETH_ADDRESS && \
@@ -39,4 +40,4 @@ RUN export NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-address.txt | tail -
     echo "CONFIG" && cat config.json && \
     go build
 
-ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json" --key "fc7f145547d4e4dba155cc8f3b77b447c68a0afb4203c91a5a99bea9f4339690"
+ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json" --key "$RUN_KEY"
