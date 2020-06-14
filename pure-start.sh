@@ -183,7 +183,7 @@ pure_start () {
         # local address_list=$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f1 | sed 's/\(.*\)/"\1"/g' |  tr '\n' ',')
         local address_list=$(echo "[$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f1 | sed 's/\(.*\)/"\1"/g' |  tr '\n' ',')]")
         echo "Address list for GH ETH node deployment: $address_list"
-        echo "Private key for node #1: $private_key"
+        echo "Private key for node #$((i+1)): $private_key"
         
         docker build --no-cache -f ghnode.dockerfile \
              --build-arg ETH_ADDRESS=$address_list \
