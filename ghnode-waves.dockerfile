@@ -24,7 +24,6 @@ RUN cd ./contracts/waves && \
     surfboard test deploy.js
 
 RUN cd ./gh-node && \
-    bash build-conf-waves.sh --node-url $NODE_URL --native-url $LEDGER_URL && \
-    go build
+    bash build-conf-waves.sh --node-url $NODE_URL --native-url $LEDGER_URL
 
 ENTRYPOINT cd gh-node && ./gh-node --key "waves private node seed with waves tokens1" --config "config-waves.json"

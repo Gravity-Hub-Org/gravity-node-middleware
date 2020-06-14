@@ -168,12 +168,34 @@ pure_start () {
     echo "ETH Address: $eth_address"
     echo "ETH Node IP: $eth_node_ip"
 
-    # eth_gh_node_vol="ghnode-eth-1"
-    # waves_gh_node_vol="ghnode-waves-1"
+    local eth_gh_node_vol="ghnode-eth-"
+    # local waves_gh_node_vol="ghnode-waves-"
   
-    # docker volume create "$eth_gh_node_vol"
     # docker volume create "$waves_gh_node_vol"
 
+
+    # Deploy contracts one time
+
+    local proj_dir=$(pwd)
+    local concept_dir="$proj_dir/proof-of-concept"
+
+    cd "$concept_dir"
+    echo "Starting contracts deploy"
+    cd ./contracts/ethereum && \
+        bash patcher.sh --eth-network "$eth_node_ip" --eth-address "$address_list" && \
+        cat truffle-config.js && sleep 1 && \
+        truffle migrate --network external | tee migration.txt
+
+    cd "$concept_dir"
+    # RUN echo "Migration file: \n" && cat ./contracts/ethereum/migration.txt
+    # RUN cd ./contracts/ethereum && cat migration.txt | bash address-extractor.sh >> nebula-address.txt
+    local nebula_address=$(cd ./contracts/ethereum && cat migration.txt | bash address-extractor.sh >> nebula-address.txt && cat ./nebula-address.txt | tail -c +3)
+    echo "Migration file: \n" && cat ./migration.txt
+
+    cd "$proj_dir"
+
+    echo "Nebula address is: $nebula_address"
+    # cat ./contracts/ethereum/nebula-address.txt | tail -c +3
     # Building 5 eth gh nodes
     # gh_eth_nodes_qty 
     for ((i = 0; i < $gh_eth_nodes_qty; i++))
@@ -190,6 +212,7 @@ pure_start () {
              --build-arg NODE_URL="http://$eth_node_ip:8545" \
              --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
              --build-arg ETH_NETWORK=$eth_node_ip \
+             --build-arg NEBULA_ADDRESS=$nebula_address \
              --build-arg RUN_KEY=$private_key -t "$ghnode_tag:1" .
 
         # docker run -d -p 26669:26657 \
