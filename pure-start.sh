@@ -187,7 +187,7 @@ pure_start () {
         docker build -f ghnode-waves.dockerfile \
         --build-arg NODE_URL="http://$waves_node_ip:6869" \
         --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
-        --build-arg KEY=${priv_keys_waves[j]} \
+        --build-arg KEY="${priv_keys_waves[j]}" \
         -t "$ghnode_waves_tag:$j" .
         
         docker run -d -p 26668:26657 \
