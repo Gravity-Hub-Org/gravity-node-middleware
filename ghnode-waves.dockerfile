@@ -28,4 +28,4 @@ RUN cd ./gh-node && \
     bash build-conf-waves.sh --node-url $NODE_URL --native-url $LEDGER_URL && \
     go build
 
-ENTRYPOINT cd gh-node && ./gh-node --key $KEY --config "config-waves.json"
+ENTRYPOINT cd gh-node && ./gh-node --key "$KEY" --config "config-waves.json"
