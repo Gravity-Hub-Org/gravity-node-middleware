@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ARG NODE_URL="http://localhost:6869"
 ARG LEDGER_URL="blank"
 ARG KEY=""
-
+ENV SEED=$KEY
 # Deps
 RUN apt-get install bash
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
@@ -28,4 +28,4 @@ RUN cd ./gh-node && \
     bash build-conf-waves.sh --node-url $NODE_URL --native-url $LEDGER_URL && \
     go build
 
-ENTRYPOINT cd gh-node && ./gh-node --key ${KEY} --config "config-waves.json"
+ENTRYPOINT cd gh-node && ./gh-node --key $SEED --config "config-waves.json"
