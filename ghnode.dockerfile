@@ -24,6 +24,7 @@ ARG RUN_KEY='fc7f145547d4e4dba155cc8f3b77b447c68a0afb4203c91a5a99bea9f4339690'
 
 RUN cd ./contracts/ethereum && \
     bash patcher.sh --eth-network $ETH_NETWORK --eth-address $ETH_ADDRESS && \
+    cat ./migrations/2_initial_contracts.js && \
     cat truffle-config.js && sleep 1 && \
     truffle migrate --network external | tee migration.txt
 
@@ -37,7 +38,6 @@ RUN export NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-address.txt | tail -
     rm config.json && \
     bash build-conf.sh --nebula $NEBULA_ADDRESS --node-url $NODE_URL \
        --native-url $LEDGER_URL && \ 
-    echo "CONFIG" && cat config.json && \
-    go build
+    echo "CONFIG" && cat config.json
 
 ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json" --key "$RUN_KEY"

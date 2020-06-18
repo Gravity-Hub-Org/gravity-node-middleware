@@ -168,33 +168,45 @@ pure_start () {
     echo "ETH Address: $eth_address"
     echo "ETH Node IP: $eth_node_ip"
 
-    # eth_gh_node_vol="ghnode-eth-1"
+    eth_gh_node_vol="ghnode-eth-1"
     # waves_gh_node_vol="ghnode-waves-1"
   
-    # docker volume create "$eth_gh_node_vol"
+    docker volume create "$eth_gh_node_vol"
     # docker volume create "$waves_gh_node_vol"
 
-    # Building 5 eth gh nodes
-    # gh_eth_nodes_qty 
-    for ((i = 0; i < $gh_eth_nodes_qty; i++))
-    do
-        local tail_arg="+$((i+1))"
-        local private_key=$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f2 | tail -n "$tail_arg" | head -n1)
-        # local address_list=$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f1 | sed 's/\(.*\)/"\1"/g' |  tr '\n' ',')
-        local address_list=$(echo "[$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f1 | sed 's/\(.*\)/"\1"/g' |  tr '\n' ',')]")
-        echo "Address list for GH ETH node deployment: $address_list"
-        echo "Private key for node #$((i+1)): $private_key"
-        
-        docker build --no-cache -f ghnode.dockerfile \
-             --build-arg ETH_ADDRESS=$address_list \
+    # grep first private key which IS WRONG
+    # local private_key=$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f2 | tail -n +1 | head -n1)
+    local dep_eth_address=$(echo "'$(cat ghnode-eth-list.txt | grep ',' | tr ',' ' ' | awk '{ print $1 }' | tr '\n' ',' | head -c -1)'.split(',')")
+    local first_pk=$(cat ghnode-eth-list.txt | grep ',' | tr ',' ' ' | awk '{ print $2 }' | head -n1)
+    
+    echo "Private key: $first_pk"
+    echo "Address list: $dep_eth_address"
+    echo "node url: $eth_node_ip"
+    # echo "ledger 
+
+    docker build --no-cache -f ghnode.dockerfile \
+             --build-arg ETH_ADDRESS="$dep_eth_address" \
              --build-arg NODE_URL="http://$eth_node_ip:8545" \
              --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
-             --build-arg ETH_NETWORK=$eth_node_ip \
-             --build-arg RUN_KEY=$private_key -t "$ghnode_tag:1" .
+             --build-arg ETH_NETWORK="$eth_node_ip" \
+             --build-arg RUN_KEY="$first_pk" -t "$ghnode_tag:1" .
 
         # docker run -d -p 26669:26657 \
-        docker run -d "$ghnode_tag:1"
-    done
+    docker run -d --mount source=$volume_name,destination=$HOME/$volume_name "$ghnode_tag:1"
+
+    exit 0
+    # Building 5 eth gh nodes
+    # gh_eth_nodes_qty 
+    # for ((i = 0; i < $gh_eth_nodes_qty; i++))
+    # do
+        # local tail_arg="+$((i+1))"
+        # local private_key=$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f2 | tail -n "$tail_arg" | head -n1)
+        # local address_list=$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f1 | sed 's/\(.*\)/"\1"/g' |  tr '\n' ',')
+        # local address_list=$(echo "[$(cat ghnode-eth-list.txt | grep ',' | cut -d, -f1 | sed 's/\(.*\)/"\1"/g' |  tr '\n' ',')]")
+        # echo "Address list for GH ETH node deployment: $address_list"
+        # echo "Private key for node #$((i+1)): $private_key"
+        
+         # done
 
     # Running 5 eth gh nodes
     docker build -f ghnode-waves.dockerfile \
@@ -205,6 +217,17 @@ pure_start () {
     docker run -d -p 26668:26657 \
          --mount source=$waves_gh_node_vol,destination=$HOME/$waves_gh_node_vol \
          "$ghnode_waves_tag:1"
+}
+
+
+drop_container_volumes () {
+    if [[ -n "$eth_gh_node_vol" ]]; then
+       docker volume rm $eth_gh_node_vol
+    fi
+
+    if [[ -n "$waves_gh_node_vol" ]]; then
+       docker volume rm $waves_gh_node_vol
+    fi
 }
 
 shutdown_environment () {
@@ -223,11 +246,15 @@ shutdown_environment () {
 
     echo "Dropping all gh nodes..."
     docker ps -a | grep "$ghnode_tag"  awk '{ print $1 }' | xargs -L1 docker stop  
+
+    drop_container_volumes
 }
 
 drop_all_containers () {
     docker ps -a | awk '{ print $1 }' | xargs -L1 docker stop
     docker ps -a | awk '{ print $1 }' | xargs -L1 docker rm
+
+    drop_container_volumes
 }
 
 # Sig kill handler
