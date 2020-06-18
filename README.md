@@ -1,5 +1,20 @@
 #  Gravity Node Middleware
 
+##  Clone
+
+Firstly, clone repo recursively
+
+```
+git clone --recurse-submodules https://github.com/Gravity-Hub-Org/gravity-node-middleware.git
+```
+
+## Dependencies
+
+1. jq (apt-get install jq)
+2. [Docker](https://docs.docker.com/get-docker/)
+3. bash
+
+
 ##  Deployment
 
 You can automatically start deploying the environment by calling:
