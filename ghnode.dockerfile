@@ -39,7 +39,7 @@ RUN echo 1 && export RUNTIME_NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-ad
     echo "Nebula address: $RUNTIME_NEBULA_ADDRESS" && \
     rm config.json && \
     bash build-conf.sh --nebula $RUNTIME_NEBULA_ADDRESS --node-url $NODE_URL \
-       --native-url $LEDGER_URL && \ 
+       --native-url $LEDGER_URL --tcp-priv-key "$RUN_KEY" && \ 
     echo "CONFIG" && cat config.json
 
-ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json" --key "$RUN_KEY"
+ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json"
