@@ -8,7 +8,8 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ARG NODE_URL="http://localhost:6869"
 ARG LEDGER_URL="blank"
-
+ARG KEY=""
+ENV SEED=$KEY
 # Deps
 RUN apt-get install bash
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -

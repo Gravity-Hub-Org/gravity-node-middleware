@@ -218,18 +218,29 @@ pure_start () {
         
     done
 
-    # exit 0
-    # Running 5 eth gh nodes
-    docker build -f ghnode-waves.dockerfile \
-         --build-arg NODE_URL="http://$waves_node_ip:6869" \
-         --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
-         -t "$ghnode_waves_tag:1" .
+    priv_keys_waves=("waves private node seed with waves tokens1" 
+                    "waves private node seed with waves tokens2" 
+                    "waves private node seed with waves tokens3"
+                    "waves private node seed with waves tokens4" 
+                    "waves private node seed with waves tokens5")
 
-    docker run -d -p 26668:26657 \
+                  
+    waves_gh_node_vol="ghnode-waves-1"
+
+    for ((j = 0; j<5; j++))
+    do
+        docker build -f ghnode-waves.dockerfile \
+        --build-arg NODE_URL="http://$waves_node_ip:6869" \
+        --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
+        --build-arg KEY="${priv_keys_waves[j]}" \
+        -t "$ghnode_waves_tag:$j" .
+        
+        docker run -d \
          --mount source=$waves_gh_node_vol,destination=$HOME/$waves_gh_node_vol \
-         "$ghnode_waves_tag:1"
-}
-
+         "$ghnode_waves_tag:$j"
+    done 
+   
+    eth_gh_node_vol="ghnode-eth-1"
 
 drop_container_volumes () {
     if [[ -n "$eth_gh_node_vol" ]]; then
