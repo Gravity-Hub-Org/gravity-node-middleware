@@ -79,6 +79,7 @@ configure_ledger_nodes () {
     
       local ledger_id=$(
           docker run -d \
+          --name "ledger-node-$((i+1))" \
           --mount source=$volume_name,destination=$HOME/$volume_name "$image_name"
       )
 
@@ -214,7 +215,7 @@ pure_start () {
              --build-arg RUN_KEY="$first_pk" -t "$ghnode_tag:1" .
 
         # docker run -d --mount source=$volume_name,destination=$HOME/$volume_name "$ghnode_tag:1"
-        docker run -d "$ghnode_tag:1"
+        docker run --name "gh-node-eth-$((i+1))" -d "$ghnode_tag:1"
         
     done
 
@@ -233,14 +234,16 @@ pure_start () {
         --build-arg NODE_URL="http://$waves_node_ip:6869" \
         --build-arg LEDGER_URL="http://${rpc_urls[0]}" \
         --build-arg KEY="${priv_keys_waves[j]}" \
+        --build-arg DEPLOY="$j" \
         -t "$ghnode_waves_tag:$j" .
         
         docker run -d \
+         --name "gh-node-waves-$((j+1))" \
          --mount source=$waves_gh_node_vol,destination=$HOME/$waves_gh_node_vol \
          "$ghnode_waves_tag:$j"
     done 
-   
-    eth_gh_node_vol="ghnode-eth-1"
+
+}   
 
 drop_container_volumes () {
     if [[ -n "$eth_gh_node_vol" ]]; then

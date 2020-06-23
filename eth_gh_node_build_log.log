@@ -1,28 +1,52 @@
-Sending build context to Docker daemon    116MB
-Step 1/19 : FROM golang:1.14-buster as gh-node
+Sending build context to Docker daemon  129.8MB
+Step 1/16 : FROM golang:1.14-buster as gh-node
  ---> 7e5e8028e8ec
-Step 2/19 : WORKDIR /app
- ---> Running in 8ee25cddd413
-Removing intermediate container 8ee25cddd413
- ---> a7707fc6672e
-Step 3/19 : COPY /proof-of-concept/ /app/
- ---> ed67be864979
-Step 4/19 : ENV DEBIAN_FRONTEND noninteractive
- ---> Running in 4e6e9ce63320
-Removing intermediate container 4e6e9ce63320
- ---> 662aa41f78e3
-Step 5/19 : RUN apt-get install bash
- ---> Running in 0fb206dd4658
+Step 2/16 : WORKDIR /app
+ ---> Running in e5d9d8d99673
+Removing intermediate container e5d9d8d99673
+ ---> 04c1b2f25375
+Step 3/16 : COPY /proof-of-concept/ /app/
+ ---> cdf9533176b9
+Step 4/16 : ENV DEBIAN_FRONTEND noninteractive
+ ---> Running in 8cb0de689667
+Removing intermediate container 8cb0de689667
+ ---> ac62265804f9
+Step 5/16 : ARG ETH_NETWORK=0.0.0.0
+ ---> Running in dbe61c3198da
+Removing intermediate container dbe61c3198da
+ ---> 07983687b2d1
+Step 6/16 : ARG ETH_ADDRESS=idk
+ ---> Running in 0e52002300f0
+Removing intermediate container 0e52002300f0
+ ---> c8d87b9c4001
+Step 7/16 : ARG NEBULA_ADDRESS=0
+ ---> Running in 8cc481f2b00d
+Removing intermediate container 8cc481f2b00d
+ ---> b678c9108559
+Step 8/16 : ARG LEDGER_URL=idk
+ ---> Running in 3cbfbd3772a8
+Removing intermediate container 3cbfbd3772a8
+ ---> 95bea4c18323
+Step 9/16 : ARG NODE_URL=http://127.0.0.1:8545
+ ---> Running in f8534f118c5a
+Removing intermediate container f8534f118c5a
+ ---> 269781bd2004
+Step 10/16 : ARG RUN_KEY='fc7f145547d4e4dba155cc8f3b77b447c68a0afb4203c91a5a99bea9f4339690'
+ ---> Running in e81fcd9f6c4a
+Removing intermediate container e81fcd9f6c4a
+ ---> 732abff1cf91
+Step 11/16 : RUN apt-get install bash
+ ---> Running in 48a94ced4f55
 Reading package lists...
 Building dependency tree...
 Reading state information...
 bash is already the newest version (5.0-4).
 bash set to manually installed.
 0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
-Removing intermediate container 0fb206dd4658
- ---> bd837248abd0
-Step 6/19 : RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
- ---> Running in 6707182b1bd4
+Removing intermediate container 48a94ced4f55
+ ---> 8802d9f55b47
+Step 12/16 : RUN bash ./gh-node/deps.sh -i $NEBULA_ADDRESS
+ ---> Running in b6b44f1be01e
 
 ## Installing the NodeSource Node.js 14.x repo...
 
@@ -30,13 +54,13 @@ Step 6/19 : RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 ## Populating apt-get cache...
 
 + apt-get update
-Get:1 http://security.debian.org/debian-security buster/updates InRelease [65.4 kB]
-Get:2 http://deb.debian.org/debian buster InRelease [121 kB]
+Get:1 http://deb.debian.org/debian buster InRelease [121 kB]
+Get:2 http://security.debian.org/debian-security buster/updates InRelease [65.4 kB]
 Get:3 http://deb.debian.org/debian buster-updates InRelease [51.9 kB]
-Get:4 http://security.debian.org/debian-security buster/updates/main amd64 Packages [203 kB]
+Get:4 http://security.debian.org/debian-security buster/updates/main amd64 Packages [204 kB]
 Get:5 http://deb.debian.org/debian buster/main amd64 Packages [7905 kB]
 Get:6 http://deb.debian.org/debian buster-updates/main amd64 Packages [7868 B]
-Fetched 8355 kB in 2s (4202 kB/s)
+Fetched 8355 kB in 2s (3995 kB/s)
 Reading package lists...
 
 ## Installing packages required for setup: lsb-release...
@@ -61,12 +85,12 @@ Reading package lists...
 ## Running `apt-get update` for you...
 
 + apt-get update
-Hit:1 http://deb.debian.org/debian buster InRelease
-Hit:2 http://deb.debian.org/debian buster-updates InRelease
-Hit:3 http://security.debian.org/debian-security buster/updates InRelease
+Hit:1 http://security.debian.org/debian-security buster/updates InRelease
+Hit:2 http://deb.debian.org/debian buster InRelease
+Hit:3 http://deb.debian.org/debian buster-updates InRelease
 Get:4 https://deb.nodesource.com/node_14.x buster InRelease [4584 B]
 Get:5 https://deb.nodesource.com/node_14.x buster/main amd64 Packages [765 B]
-Fetched 5349 B in 1s (8663 B/s)
+Fetched 5349 B in 1s (5938 B/s)
 Reading package lists...
 
 ## Run `sudo apt-get install -y nodejs` to install Node.js 14.x and npm
@@ -78,10 +102,6 @@ Reading package lists...
      sudo apt-get update && sudo apt-get install yarn
 
 
-Removing intermediate container 6707182b1bd4
- ---> 348feab70895
-Step 7/19 : RUN apt-get install -y nodejs && curl -L https://npmjs.org/install.sh | sh
- ---> Running in db4973e90b5a
 Reading package lists...
 Building dependency tree...
 Reading state information...
@@ -92,16 +112,16 @@ Need to get 24.3 MB of archives.
 After this operation, 116 MB of additional disk space will be used.
 Get:1 https://deb.nodesource.com/node_14.x buster/main amd64 nodejs amd64 14.4.0-1nodesource1 [24.3 MB]
 [91mdebconf: delaying package configuration, since apt-utils is not installed
-[0mFetched 24.3 MB in 0s (59.0 MB/s)
+[0mFetched 24.3 MB in 0s (65.5 MB/s)
 Selecting previously unselected package nodejs.
 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 16115 files and directories currently installed.)
 Preparing to unpack .../nodejs_14.4.0-1nodesource1_amd64.deb ...
 Unpacking nodejs (14.4.0-1nodesource1) ...
 Setting up nodejs (14.4.0-1nodesource1) ...
-[91m  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Lef[0m[91mt  Speed
-  0     0    0     0    0  [0m[91m   0      0      0 --[0m[91m:--:-- --:-[0m[91m-:-- --[0m[91m:--:--    [0m[91m 0[0m[91m  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0[0m[91m  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-[0m[91m100  5450  100  5450    0     0   6048      0 --:--:-- --:--:-- --:--:--  6048
+[91m [0m[91m [0m[91m%[0m[91m T[0m[91mo[0m[91mta[0m[91ml[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m%[0m[91m R[0m[91me[0m[91mc[0m[91me[0m[91mi[0m[91mv[0m[91me[0m[91md[0m[91m [0m[91m%[0m[91m [0m[91mX[0m[91mf[0m[91me[0m[91mr[0m[91md[0m[91m [0m[91m [0m[91mA[0m[91mv[0m[91me[0m[91mr[0m[91ma[0m[91mg[0m[91me[0m[91m [0m[91mS[0m[91mp[0m[91me[0m[91me[0m[91md[0m[91m [0m[91m [0m[91m [0m[91mT[0m[91mi[0m[91mm[0m[91me[0m[91m [0m[91m [0m[91m [0m[91m [0m[91mT[0m[91mi[0m[91mm[0m[91me[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91mT[0m[91mi[0m[91mm[0m[91me[0m[91m [0m[91m [0m[91mC[0m[91mur[0m[91mr[0m[91me[0m[91mnt
+[0m[91m [0m[91m  [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91mD[0m[91ml[0m[91mo[0m[91ma[0m[91md[0m[91m [0m[91m [0m[91mU[0m[91mp[0m[91ml[0m[91mo[0m[91ma[0m[91md[0m[91m [0m[91m [0m[91m [0m[91mT[0m[91mo[0m[91mt[0m[91ma[0m[91ml[0m[91m [0m[91m [0m[91m [0m[91mS[0m[91mp[0m[91me[0m[91mn[0m[91mt[0m[91m [0m[91m [0m[91m [0m[91m [0m[91mL[0m[91mef[0m[91mt[0m[91m [0m[91m [0m[91mS[0m[91mp[0m[91mee[0m[91md[0m[91m
+[0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m  [0m[91m0[0m[91m [0m[91m  [0m[91m [0m[91m [0m[91m0  [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m [0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m [0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m[0m[91m  [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m [0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m [0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m [0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m-[0m[91m  [0m[91m [0m[91m [0m[91m [0m[91m0[0m[91m
+[0m[91m10[0m[91m0 [0m[91m [0m[91m5[0m[91m4[0m[91m5[0m[91m0[0m[91m [0m[91m [0m[91m1[0m[91m0[0m[91m0[0m[91m [0m[91m [0m[91m5[0m[91m4[0m[91m5[0m[91m0 [0m[91m [0m[91m  [0m[91m0[0m[91m [0m[91m  [0m[91m [0m[91m [0m[91m0 [0m[91m [0m[91m64[0m[91m8[0m[91m8[0m[91m0[0m[91m  [0m[91m [0m[91m [0m[91m  [0m[91m0[0m[91m --[0m[91m:[0m[91m-[0m[91m-[0m[91m:[0m[91m-[0m[91m- --[0m[91m:[0m[91m-[0m[91m-[0m[91m:--[0m[91m [0m[91m--[0m[91m:[0m[91m--[0m[91m:-[0m[91m-[0m[91m 648[0m[91m8[0m[91m0
 [0mtar=/bin/tar
 version:
 tar (GNU tar) 1.30
@@ -113,18 +133,14 @@ There is NO WARRANTY, to the extent permitted by law.
 Written by John Gilmore and Jay Fenlason.
 install npm@latest
 [91mfetching: https://registry.npmjs.org/npm/-/npm-6.14.5.tgz
-[0mremoved 435 packages in 7.887s
+[0mremoved 435 packages in 7.048s
 /usr/bin/npm -> /usr/lib/node_modules/npm/bin/npm-cli.js
 /usr/bin/npx -> /usr/lib/node_modules/npm/bin/npx-cli.js
 + npm@6.14.5
-added 435 packages from 873 contributors in 9.521s
+added 435 packages from 873 contributors in 8.303s
 It worked
-Removing intermediate container db4973e90b5a
- ---> f032f20bbe0d
-Step 8/19 : RUN apt-get update &&     apt-get -y install gcc mono-mcs &&     rm -rf /var/lib/apt/lists/*
- ---> Running in bf9cac6e5501
-Hit:1 http://deb.debian.org/debian buster InRelease
-Hit:2 http://security.debian.org/debian-security buster/updates InRelease
+Hit:1 http://security.debian.org/debian-security buster/updates InRelease
+Hit:2 http://deb.debian.org/debian buster InRelease
 Hit:3 http://deb.debian.org/debian buster-updates InRelease
 Hit:4 https://deb.nodesource.com/node_14.x buster InRelease
 Reading package lists...
@@ -176,7 +192,7 @@ Get:20 http://deb.debian.org/debian buster/main amd64 libmono-i18n-west4.0-cil a
 Get:21 http://deb.debian.org/debian buster/main amd64 libmono-microsoft-csharp4.0-cil all 5.18.0.240+dfsg-3 [139 kB]
 Get:22 http://deb.debian.org/debian buster/main amd64 mono-mcs all 5.18.0.240+dfsg-3 [559 kB]
 [91mdebconf: delaying package configuration, since apt-utils is not installed
-[0mFetched 7622 kB in 0s (80.2 MB/s)
+[0mFetched 7622 kB in 0s (53.4 MB/s)
 Selecting previously unselected package libpipeline1:amd64.
 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 20919 files and directories currently installed.)
 Preparing to unpack .../00-libpipeline1_1.5.1-2_amd64.deb ...
@@ -549,10 +565,6 @@ Certificate added: C=US, O="thawte, Inc.", OU=Certification Services Division, O
 Import process completed.
 Done
 done.
-Removing intermediate container bf9cac6e5501
- ---> 051e194f4e00
-Step 9/19 : RUN npm i -g --unsafe-perm=true --allow-root truffle
- ---> Running in e0385d208bdd
 [91mnpm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please update to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)
 [0m/usr/bin/truffle -> /usr/lib/node_modules/truffle/build/cli.bundled.js
 
@@ -562,35 +574,11 @@ Step 9/19 : RUN npm i -g --unsafe-perm=true --allow-root truffle
 [91m- Fetching solc version list from solc-bin. Attempt #1
 ✔ Downloading compiler. Attempt #1.
 [0m+ truffle@5.1.31
-added 27 packages from 439 contributors in 8.849s
-Removing intermediate container e0385d208bdd
- ---> 0d17acb1f9da
-Step 10/19 : ARG ETH_NETWORK=0.0.0.0
- ---> Running in 2480b834ccf0
-Removing intermediate container 2480b834ccf0
- ---> e05a3a9bc5e2
-Step 11/19 : ARG ETH_ADDRESS=idk
- ---> Running in e0d6c8e60e9e
-Removing intermediate container e0d6c8e60e9e
- ---> dd92b92e9235
-Step 12/19 : ARG NEBULA_ADDRESS=0
- ---> Running in a9e61c65d839
-Removing intermediate container a9e61c65d839
- ---> bbb1800abef3
-Step 13/19 : ARG LEDGER_URL=idk
- ---> Running in 39ba59e8bed5
-Removing intermediate container 39ba59e8bed5
- ---> 03e8c51f182e
-Step 14/19 : ARG NODE_URL=http://127.0.0.1:8545
- ---> Running in 050757c171cb
-Removing intermediate container 050757c171cb
- ---> 9db5cd69609b
-Step 15/19 : ARG RUN_KEY='fc7f145547d4e4dba155cc8f3b77b447c68a0afb4203c91a5a99bea9f4339690'
- ---> Running in 1f89ac6c2f65
-Removing intermediate container 1f89ac6c2f65
- ---> 043491543f8b
-Step 16/19 : RUN cd ./contracts/ethereum &&     bash patcher.sh --nebula $NEBULA_ADDRESS --eth-network $ETH_NETWORK --eth-address $ETH_ADDRESS &&     cat ./migrations/2_initial_contracts.js &&     cat truffle-config.js && sleep 1 &&     truffle migrate --network external | tee migration.txt; exit 0
- ---> Running in ae33d892209b
+added 27 packages from 439 contributors in 9.118s
+Removing intermediate container b6b44f1be01e
+ ---> ee41031a5964
+Step 13/16 : RUN cd ./contracts/ethereum &&     bash patcher.sh --nebula $NEBULA_ADDRESS --eth-network $ETH_NETWORK --eth-address $ETH_ADDRESS &&     cat ./migrations/2_initial_contracts.js &&     cat truffle-config.js && sleep 1 &&     truffle migrate --network external | tee migration.txt; exit 0
+ ---> Running in 18c01814209f
 const SubMock = artifacts.require("SubMock");
 const Nebula = artifacts.require("Nebula");
 const Queue = artifacts.require("./libs/QueueLib");
@@ -640,7 +628,7 @@ Starting migrations...
 ======================
 > Network name:    'external'
 > Network id:      1337
-> Block gas limit: 6444641 (0x625661)
+> Block gas limit: 6507839 (0x634d3f)
 
 
 1_initial_migration.js
@@ -648,13 +636,13 @@ Starting migrations...
 
    Replacing 'Migrations'
    ----------------------
-   > transaction hash:    0xab2590838477211ffd1c11617b6b5dd1496ccf94e0ddfc4308112e994a7f8ab2
+   > transaction hash:    0xdd7ac7eba12dbe7e1dca86b0586e1c2bff45f8f9557d9df2e8a3c89a12e1bee0
 [91m- Blocks: 0            Seconds: 0
-[0m   > Blocks: 1            Seconds: 4
-   > contract address:    0xBa8807625BC7F1Bf8fB84dF5e30674DeEd6b5d7b
-   > block number:        28
-   > block timestamp:     1592573675
-   > account:             0x50F769af765305Ec02D6f557912Dc1faE01296FA
+[0m   > Blocks: 0            Seconds: 4
+   > contract address:    0x6eA74a9cA8326e5bf5FCFFAa0Bd54621aF9eaeA1
+   > block number:        38
+   > block timestamp:     1592947043
+   > account:             0x8d50309233C9ADEdBd160BB7cd23334A25209Fd0
    > balance:             115792089237316195423570985008687907853269984665640564039457.584007913129639927
    > gas used:            164175 (0x2814f)
    > gas price:           20 gwei
@@ -674,13 +662,13 @@ Starting migrations...
 
    Deploying 'QueueLib'
    --------------------
-   > transaction hash:    0xe42f8053bb11cae46c044d77e21c2c037065be56a2d98244cdd900b5514e5c83
+   > transaction hash:    0x383238aa51f727fa4123dd7665783159d97cfa253ffd30781a0d670c482f0841
 [91m- Blocks: 0            Seconds: 0
 [0m   > Blocks: 0            Seconds: 4
-   > contract address:    0x2Ad09524ADAdDD794eb7D7dF919eb54513d50556
-   > block number:        30
-   > block timestamp:     1592573685
-   > account:             0x50F769af765305Ec02D6f557912Dc1faE01296FA
+   > contract address:    0x17Bd183FE2ede205FE6F3943847919329d643c3A
+   > block number:        40
+   > block timestamp:     1592947053
+   > account:             0x8d50309233C9ADEdBd160BB7cd23334A25209Fd0
    > balance:             115792089237316195423570985008687907853269984665640564039457.584007913129639927
    > gas used:            197069 (0x301cd)
    > gas price:           20 gwei
@@ -690,17 +678,17 @@ Starting migrations...
 
    Linking
    -------
-   * Contract: Nebula <--> Library: QueueLib (at address: 0x2Ad09524ADAdDD794eb7D7dF919eb54513d50556)
+   * Contract: Nebula <--> Library: QueueLib (at address: 0x17Bd183FE2ede205FE6F3943847919329d643c3A)
 
    Deploying 'Nebula'
    ------------------
-   > transaction hash:    0x8ca8bcf63ff6738ce81cad0058af81981e1eb1529aecf37f4203c401d8fa9344
 [91m- Blocks: 0            Seconds: 0
-[0m   > Blocks: 0            Seconds: 4
-   > contract address:    0x0Ba28c475327410bBE78f967A2844E8FB3EcD220
-   > block number:        31
-   > block timestamp:     1592573690
-   > account:             0x50F769af765305Ec02D6f557912Dc1faE01296FA
+[0m   > transaction hash:    0x448c1f11c4cc4ec5afb88b2a77d90f9793bbc86abe72bb3ef05ffc4ec57012eb
+   > Blocks: 0            Seconds: 4
+   > contract address:    0x62b7d4E3b3602fB450257a83Bec117833Ef6F5B5
+   > block number:        41
+   > block timestamp:     1592947058
+   > account:             0x8d50309233C9ADEdBd160BB7cd23334A25209Fd0
    > balance:             115792089237316195423570985008687907853269984665640564039457.584007913129639927
    > gas used:            1233903 (0x12d3ef)
    > gas price:           20 gwei
@@ -710,13 +698,13 @@ Starting migrations...
 
    Deploying 'SubMock'
    -------------------
-   > transaction hash:    0x49d286e2c815432ab967fadd985a8ff261e477b08ee09b5168ea3dd06d0e1851
+   > transaction hash:    0x0b14dc0ab29e38d199366dc4c1d0a7c221efdac84cbd064edcb47cd0dd653739
 [91m- Blocks: 0            Seconds: 0
 [0m   > Blocks: 0            Seconds: 4
-   > contract address:    0x91C416337255d6E0826eaB43128F22F694de7769
-   > block number:        32
-   > block timestamp:     1592573695
-   > account:             0x50F769af765305Ec02D6f557912Dc1faE01296FA
+   > contract address:    0xeB3c2F5F1A1e1F512D4d1E5391878aAC0946e981
+   > block number:        42
+   > block timestamp:     1592947063
+   > account:             0x8d50309233C9ADEdBd160BB7cd23334A25209Fd0
    > balance:             115792089237316195423570985008687907853269984665640564039457.584007913129639927
    > gas used:            174033 (0x2a7d1)
    > gas price:           20 gwei
@@ -737,32 +725,31 @@ Summary
 > Final cost:          0.0353836 ETH
 
 
-Removing intermediate container ae33d892209b
- ---> d667fd36cc7f
-Step 17/19 : RUN cd ./contracts/ethereum && cat migration.txt | bash address-extractor.sh >> nebula-address.txt
- ---> Running in 24cb0656e8ab
-Removing intermediate container 24cb0656e8ab
- ---> c376579d3e4c
-Step 18/19 : RUN echo 1 && export RUNTIME_NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-address.txt | tail -c +3) &&     cd ./gh-node &&     export RUNTIME_NEBULA_ADDRESS=$(bash -c "if [ $NEBULA_ADDRESS = 0 ]; then echo $RUNTIME_NEBULA_ADDRESS; else echo $NEBULA_ADDRESS; fi") &&     echo "AAA: $NEBULA_ADDRESS; BBB: $RUNTIME_NEBULA_ADDRESS" &&     echo "Nebula address: $RUNTIME_NEBULA_ADDRESS" &&     rm config.json &&     bash build-conf.sh --nebula $RUNTIME_NEBULA_ADDRESS --node-url $NODE_URL        --native-url $LEDGER_URL --tcp-priv-key "$RUN_KEY" &&     echo "CONFIG" && cat config.json
- ---> Running in b85ec14b1ade
+Removing intermediate container 18c01814209f
+ ---> d1bceff61e00
+Step 14/16 : RUN cd ./contracts/ethereum && cat migration.txt | bash address-extractor.sh >> nebula-address.txt
+ ---> Running in be1be8bc9cdd
+Removing intermediate container be1be8bc9cdd
+ ---> 14a8b3b8cb94
+Step 15/16 : RUN echo 1 && export RUNTIME_NEBULA_ADDRESS=$(cat ./contracts/ethereum/nebula-address.txt | tail -c +3) &&     cd ./gh-node &&     export RUNTIME_NEBULA_ADDRESS=$(bash -c "if [ $NEBULA_ADDRESS = 0 ]; then echo $RUNTIME_NEBULA_ADDRESS; else echo $NEBULA_ADDRESS; fi") &&     echo "Nebula address: $RUNTIME_NEBULA_ADDRESS" &&     rm config.json &&     bash build-conf.sh --nebula $RUNTIME_NEBULA_ADDRESS --node-url $NODE_URL        --native-url $LEDGER_URL --tcp-priv-key "$RUN_KEY" &&     echo "CONFIG" && cat config.json
+ ---> Running in 42ac87f2067b
 1
-AAA: 0; BBB: 0Ba28c475327410bBE78f967A2844E8FB3EcD220
-Nebula address: 0Ba28c475327410bBE78f967A2844E8FB3EcD220
+Nebula address: 62b7d4E3b3602fB450257a83Bec117833Ef6F5B5
 CONFIG
 {
     "TCPrivateKey": "fc7f145547d4e4dba155cc8f3b77b447c68a0afb4203c91a5a99bea9f4339690",   
-    "GHNodeURL":"http://",
+    "GHNodeURL":"http://172.17.0.4:26657",
     "Timeout":0,
     "NebulaId":"0000000000000000000000000000000000000000000000000000000000000000",
     "NodeUrl":"http://172.17.0.2:8545",
-    "NebulaContract":"0Ba28c475327410bBE78f967A2844E8FB3EcD220",
+    "NebulaContract":"62b7d4E3b3602fB450257a83Bec117833Ef6F5B5",
     "ChainType": "Ethereum"
 }
-Removing intermediate container b85ec14b1ade
- ---> 16dadb7c286c
-Step 19/19 : ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json"
- ---> Running in 5f82bc1b1139
-Removing intermediate container 5f82bc1b1139
- ---> d22b3cdeddfc
-Successfully built d22b3cdeddfc
+Removing intermediate container 42ac87f2067b
+ ---> e5c6e8a1952d
+Step 16/16 : ENTRYPOINT ./gh-node/gh-node --config "$PWD/gh-node/config.json"
+ ---> Running in ab9aa5f5df2b
+Removing intermediate container ab9aa5f5df2b
+ ---> 78bea0342c75
+Successfully built 78bea0342c75
 Successfully tagged gh-node:1
