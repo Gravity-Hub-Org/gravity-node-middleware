@@ -8,23 +8,15 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ARG NODE_URL="http://localhost:6869"
 ARG LEDGER_URL="blank"
-
+ARG DEPLOY=1
+ARG KEY=""
+ENV SEED=$KEY
 # Deps
 RUN apt-get install bash
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs && curl -L https://npmjs.org/install.sh | sh
-RUN apt-get update && \
-    apt-get -y install gcc mono-mcs && \
-    rm -rf /var/lib/apt/lists/* \
-    npm install @waves/surfboard 
-
-RUN npm i -g --unsafe-perm=true --allow-root @waves/surfboard
-RUN cd ./contracts/waves && bash patch-surfboard.sh $NODE_URL surfboard.config.json
-RUN cd ./contracts/waves && \
-    surfboard test deploy.js
+RUN echo "Installing dependencies" && export NODE_URL && bash ./gh-node/deps.sh -wi $DEPLOY; exit 0
 
 RUN cd ./gh-node && \
-    bash build-conf-waves.sh --node-url $NODE_URL --native-url $LEDGER_URL && \
-    go build
+    bash build-conf-waves.sh --priv-key $KEY --node-url $NODE_URL --native-url $LEDGER_URL && \
+    echo "Config:" && cat config-waves.json
 
-ENTRYPOINT cd gh-node && ./gh-node --key "waves private node seed with waves tokens1" --config "config-waves.json"
+ENTRYPOINT cd gh-node && ./gh-node --config "config-waves.json"

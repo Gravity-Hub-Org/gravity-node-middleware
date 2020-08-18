@@ -26,10 +26,10 @@ COPY ./ledger-config/node_key_${VALIDATOR_INDEX}.json ./ledger-node/data/config/
 
 RUN mv config.toml ./ledger-node/data/config/
 
-RUN apt-get update && \
-    apt-get -y install gcc mono-mcs
+# RUN apt-get update && \
+# apt-get -y install gcc mono-mcs
 
-RUN cd ledger-node && ls -la && ls -la ./data/config/
-RUN cd ledger-node && go build && chmod +x ledger-node
+# RUN cd ledger-node && ls -la && ls -la ./data/config/
+RUN cd ledger-node && chmod +x ledger-node
 
 ENTRYPOINT cd ledger-node && ./ledger-node --config "$PWD/data/config/config.toml"
